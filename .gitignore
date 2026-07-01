@@ -1,0 +1,7 @@
+#Configuracoes IDE
+.idea/
+.vscode/
+
+#Pacotes instalados
+.bundle/
+node_modules/
