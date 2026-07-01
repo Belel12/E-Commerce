@@ -1,18 +1,17 @@
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "puma"
-gem "rake"
-gem "sinatra"
-gem "sqlite3"
-gem "json"
-gem "activerecord"
-gem "sinatra-activerecord"
-gem "rspec"
+gem 'activerecord'
+gem 'json'
+gem 'puma'
+gem 'rake'
+gem 'rspec'
+gem 'sinatra'
+gem 'sinatra-activerecord'
+gem 'sqlite3'
 
 group :development do
-  gem "rubocop"
-  gem "pry"
+  gem 'pry'
+  gem 'rubocop'
 end
-
