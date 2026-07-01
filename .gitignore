@@ -5,3 +5,4 @@
 #Pacotes instalados
 .bundle/
 node_modules/
+/bundle_gems/
