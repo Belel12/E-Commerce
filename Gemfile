@@ -10,10 +10,10 @@ gem 'rspec'
 gem 'sinatra'
 gem 'sinatra-activerecord'
 gem 'sqlite3'
-
+gem "rackup", "~> 2.3"
 group :development do
   gem 'pry'
   gem 'rubocop'
 end
 
-gem "rackup", "~> 2.3"
+

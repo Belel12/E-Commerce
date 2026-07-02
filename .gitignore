@@ -5,4 +5,7 @@
 #Pacotes instalados
 .bundle/
 node_modules/
-/bundle_gems/
+/vendor/
+
+#banco de desenvolvimento
+src/db/ecommerce_desenvolvimento.sqlite3
