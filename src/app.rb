@@ -4,6 +4,7 @@ require 'sinatra/activerecord'
 
 Dir['./models/*.rb'].each { |file| require file}
 
+ENV["AMBIENTE"] = 'desenvolvimento'
 class ECommerceApp < Sinatra::Base
   DB_DIR = "#{__dir__}/db"
 
