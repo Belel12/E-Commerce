@@ -1,3 +1,3 @@
-require_relative 'src/app'
+require_relative 'app'
 
 run ECommerceApp; p 9292

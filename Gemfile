@@ -2,7 +2,6 @@
 
 source 'https://rubygems.org'
 
-gem 'activerecord'
 gem 'json'
 gem 'puma'
 gem 'rake'
@@ -17,3 +16,6 @@ group :development do
 end
 
 
+gem "activerecord", "~> 7.2"
+
+gem "digest", "~> 3.2"

@@ -6,6 +6,8 @@ class CreateUsuario < ActiveRecord::Migration[7.1]
       usuario.string :senha_hash, null:false
       usuario.string :cpf, null:false
       usuario.string :telefone
+
+      usuario.index :email, unique: true
     end
   end
 end
