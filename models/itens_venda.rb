@@ -3,6 +3,7 @@ class ItensVenda < ActiveRecord::Base
 
   validates :quantidade, presence: true, numericality: { greater_than: 0 }
   validates :preco_unitario, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :venda, presence: true
 
   belongs_to :produto
   belongs_to :venda
