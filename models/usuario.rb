@@ -8,11 +8,12 @@ class Usuario < ActiveRecord::Base
   }
   validates :cpf, presence: true
   validates :senha_hash, { presence: true,
-                           length: { minimum: 8 },
-                           message: 'senha deve ter no minimo 8 caracteres' }
+                           length: { minimum: 8 }
+  }
 
   has_many :produtos, dependent: :destroy
-  has_many :vendas, dependent: :nullify
+  has_many :vendas, dependent: :restrict_with_exception, foreign_key: :vendedor_id
+  has_many :compras, class_name: 'Venda', dependent: :restrict_with_exception, foreign_key: :comprador_id
 
   before_save :hash_password!
 
