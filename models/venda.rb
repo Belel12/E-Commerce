@@ -18,5 +18,7 @@ class Venda < ActiveRecord::Base
   belongs_to :vendedor, class_name: 'Usuario'
 
   has_many :itens_venda, dependent: :destroy
+  has_many :itens_venda, class_name: 'ItemVenda', dependent: :destroy, foreign_key: :venda_id
+  has_many :produtos, through: :itens_venda
 end
 
