@@ -1,6 +1,6 @@
 # db/seeds.rb
 puts 'Limpando dados antigos (ordem por causa das FKs)...'
-ItensVenda.delete_all
+ItemVenda.delete_all
 Venda.delete_all
 Produto.delete_all
 Usuario.delete_all
@@ -59,7 +59,7 @@ status_possiveis = %i[pendente paga enviada entregue cancelada]
     quantidade = rand(1..5)
     preco_unitario = produto.preco
 
-    ItensVenda.create!(
+    ItemVenda.create!(
       venda: venda,
       produto: produto,
       quantidade: quantidade,
@@ -72,5 +72,5 @@ status_possiveis = %i[pendente paga enviada entregue cancelada]
   venda.update!(valor_total: total)
 end
 
-puts "#{Venda.count} vendas criadas com #{ItensVenda.count} itens no total."
+puts "#{Venda.count} vendas criadas com #{ItemVenda.count} itens no total."
 puts 'Seed finalizado!'
