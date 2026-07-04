@@ -20,3 +20,5 @@ group :development do
   gem 'database_cleaner-active_record'
 end
 
+
+gem "rack", "~> 3.2"
