@@ -1,6 +1,12 @@
 class Venda < ActiveRecord::Base
   #define enum pro atributo status com array de simbolos
-  enum status: %i[pendente paga enviada entregue cancelada]
+  enum status: {
+    pendente: 'pendente',
+    paga: 'paga',
+    enviada: 'enviada',
+    cancelada: 'cancelada',
+    entregue: 'entregue',
+  }
 
   validates :status, presence: true, inclusion: { in: statuses.keys }
   validates :data, presence:true
