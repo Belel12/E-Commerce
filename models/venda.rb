@@ -1,3 +1,5 @@
+require_relative '../custom_exceptions/SemEstoqueError'
+
 class Venda < ActiveRecord::Base
   #define enum pro atributo status com array de simbolos
   enum status: {
@@ -17,8 +19,20 @@ class Venda < ActiveRecord::Base
   belongs_to :comprador, class_name: 'Usuario'
   belongs_to :vendedor, class_name: 'Usuario'
 
-  has_many :itens_venda, dependent: :destroy
   has_many :itens_venda, class_name: 'ItemVenda', dependent: :destroy, foreign_key: :venda_id
   has_many :produtos, through: :itens_venda
+
+  before_save :atualizar_estoque, if: -> {self.status == 'paga'}
+
+  private
+  def atualizar_estoque
+    self.itens_venda.each do |item|
+      produto = item.produto
+      next if produto.nil?
+      raise SemEstoqueError, "PRODUTO #{produto.nome} NAO POSSUI ESTOQUE SUFICIENTE" if produto.estoque < item.quantidade
+      produto.update estoque: produto.estoque - item.quantidade
+    end
+  end
+
 end
 
