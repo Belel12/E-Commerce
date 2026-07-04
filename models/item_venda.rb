@@ -9,15 +9,15 @@ class ItemVenda < ActiveRecord::Base
   belongs_to :venda
 
   before_save :somar_total
-  before_destroy :substrair_total
+  before_destroy :subtrair_total
 
   private
   def somar_total
-    self.venda.valor_total += self.preco_unitario * self.quantidade
+    venda.update!(valor_total: venda.valor_total + preco_unitario * quantidade)
   end
 
   def subtrair_total
-    self.venda.valor_total -= self.preco_unitario * self.quantidade
+    venda.update!(valor_total: venda.valor_total - preco_unitario * quantidade)
   end
 end
 
