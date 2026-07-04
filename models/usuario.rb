@@ -6,7 +6,7 @@ class Usuario < ActiveRecord::Base
                       uniqueness: true,
                       format: { with: URI::MailTo::EMAIL_REGEXP }
   }
-  validates :cpf, presence: true
+  validates :cpf, presence: true, format: { with: /\A\d+\z/}
   validates :senha_hash, { presence: true,
                            length: { minimum: 8 }
   }
