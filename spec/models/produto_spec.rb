@@ -1,5 +1,4 @@
 describe Produto, 'TESTES' do
-  #TODO: testar quando apaga o produto se a fk em item_venda fica nulo
   let!(:usuario) {
     Usuario.create(
       nome: 'fulano',
