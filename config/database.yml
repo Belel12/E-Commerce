@@ -5,3 +5,7 @@ development:
 production:
   adapter: sqlite3
   database: db/ecommerce.sqlite3
+
+test:
+  adapter: sqlite3
+  database: db/ecommerce_test.sqlite3
