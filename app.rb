@@ -14,6 +14,10 @@ class ECommerceApp < Sinatra::Base
   # nao ta funcionando, o que define por enquanto ta
   # sendo o database.yml
   #set :database, { adapter: 'sqlite3', database: 'db/ecommerce.sqlite3' }
+  set :database, {
+    adapter: 'sqlite3',
+    database: "db/ecommerce_#{ENV['RACK_ENV'] || 'development'}.sqlite3"
+  }
 end
 
 
