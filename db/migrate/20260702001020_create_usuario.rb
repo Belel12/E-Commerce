@@ -8,6 +8,7 @@ class CreateUsuario < ActiveRecord::Migration[7.1]
       usuario.string :telefone
 
       usuario.index :email, unique: true
+      usuario.index :cpf, unique: true
     end
   end
 end
