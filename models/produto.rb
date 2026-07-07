@@ -7,5 +7,6 @@ class Produto < ActiveRecord::Base
   belongs_to :usuario
 
   has_many :itens_vendas, dependent: :nullify, class_name: 'ItemVenda'
+  has_many :itens_carrinho, dependent: :destroy,class_name:'ItemCarrinho'
 end
 

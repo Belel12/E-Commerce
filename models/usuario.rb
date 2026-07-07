@@ -11,9 +11,10 @@ class Usuario < ActiveRecord::Base
                            length: { minimum: 8 }
   }
 
-  has_many :produtos, dependent: :destroy
+  has_many :produtos, dependent: :restrict_with_exception, class_name: 'Produto', foreign_key: :usuario_id
   has_many :vendas, dependent: :restrict_with_exception, foreign_key: :vendedor_id
   has_many :compras, class_name: 'Venda', dependent: :restrict_with_exception, foreign_key: :comprador_id
+  has_many :produtos_carrinho, dependent: :restrict_with_exception, class_name:'ItemCarrinho', foreign_key: :usuario_id
 
   before_save :hash_password!
 
