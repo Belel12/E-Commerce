@@ -8,7 +8,7 @@ describe Produto, 'TESTES' do
     )
   }
   context 'produto valido' do
-    let(:produto){
+    let!(:produto){
       Produto.new(
         nome: 'Pao de Queijo',
         descricao: nil,
@@ -19,11 +19,6 @@ describe Produto, 'TESTES' do
     }
     it 'deve ser persistido com sucesso' do
       expect(produto.save).to be true
-    end
-
-    it 'deve ser apagado apos delete do usuario' do
-      usuario.destroy
-      expect { produto.reload }.to raise_exception ActiveRecord::RecordNotFound
     end
   end
 

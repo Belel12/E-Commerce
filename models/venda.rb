@@ -2,7 +2,6 @@ require_relative '../custom_exceptions/SemEstoqueError'
 require_relative '../custom_exceptions/ProdutoApagadoError'
 
 class Venda < ActiveRecord::Base
-  #define enum pro atributo status com array de simbolos
   enum status: {
     pendente: 'pendente',
     paga: 'paga',
