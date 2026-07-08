@@ -1,14 +1,15 @@
 require 'digest'
 
 class Usuario < ActiveRecord::Base
-  validates :nome, presence:true
-  validates :email, { presence: true,
-                      uniqueness: true,
-                      format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :nome, presence: { message: 'NOME DE USUÁRIO É OBRIGATÓRIO' }
+  validates :email, { presence: { message: 'EMAIL É OBRIGATÓRIO' },
+                      uniqueness: { message: 'EMAIL JA ESTA CADASTRADO' },
+                      format: { with: URI::MailTo::EMAIL_REGEXP, message: 'FORMATO DE EMAIL INVÁLIDO' }
   }
-  validates :cpf, presence: true, format: { with: /\A\d+\z/}
-  validates :senha_hash, { presence: true,
-                           length: { minimum: 8 }
+  validates :cpf, presence: { message: 'CPF É OBRIGATÓRIO' },
+                  format: { with: /\A\d+\z/, message: 'FORMATO DE CPF INVÁLIDO'}
+  validates :senha_hash, { presence: { message: 'SENHA É OBRIGATÓRIA'},
+                           length: { minimum: 8, message: 'SENHA DEVE TER NO MÍNIMO 8 CARACTERES'}
   }
 
   has_many :produtos, dependent: :restrict_with_exception, class_name: 'Produto', foreign_key: :usuario_id
