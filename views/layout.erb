@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-COMMERCE</title>
+    <link rel="icon" type="image/png" href="/images/icone.png">
+    <link rel="stylesheet" href="css/layout.css">
+</head>
+  <body>
+    <nav>
+      <h1>E-Commerce</h1>
+      <% if @id_usuario %>
+        <%= erb :'layout_components/_nav_options_logged' %>
+      <% else %>
+        <%= erb :'layout_components/_nav_options_not_logged' %>
+      <% end %>
+    </nav>
+    <main>
+      <%= yield %>
+    </main>
+    <footer>
+      <img class="footer_image" alt="Logo Ecommerce" src="/images/icone.png">
+      <div class="developers">
+        <%= erb :'layout_components/developers' %>
+      </div>
+      <img class="footer_image" alt="LOGO_IFG" src="/images/logo_ifg.png">
+    </footer>
+  </body>
+</html>

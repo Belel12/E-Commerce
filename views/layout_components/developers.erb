@@ -1,0 +1,13 @@
+<p class="developers_paragraph">Desenvolvedores</p>
+<%
+  require 'json'
+  developers = JSON.parse(File.read('public/developers.json'))
+  developers.each do |dev|
+%>
+  <div class="developer_container">
+    <a href="<%= dev["github"] %>"><%= dev["nome"] %></a>
+    <div class="avatar">
+      <img class="avatar" alt="DEV AVATAR" src="<%= dev["avatar_name"] %>" >
+    </div>
+  </div>
+<% end %>
