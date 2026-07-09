@@ -1,0 +1,18 @@
+<h2>Bem vindo ao E-Commerce</h2>
+<% if @produtos.count > 0 %>
+  <h3>Confira produtos disponiveis</h3>
+  <ul>
+    <% @produtos.each do |produto| %>
+      <li>
+        <p>Nome: <%= produto.nome %></p>
+        <p>Descricao: <%= produto.descricao %></p>
+        <p>Preço: <%= produto.preco.to_s %></p>
+        <p>Estoque: <%= produto.estoque.to_s %></p>
+        <p>Vendedor: <%= produto.usuario.nome %></p>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <h3>Não temos produtos disponíveis no momento, mas você pode publicar seu produto :)</h3>
+<% end %>
+
