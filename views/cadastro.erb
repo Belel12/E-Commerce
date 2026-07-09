@@ -1,0 +1,70 @@
+<h2>Cadastro</h2>
+
+<% if @erros %>
+  <div class="erros_cadastro">
+    <p>Erro ao cadastrar</p>
+    <ul>
+      <% @erros.each do |erro|%>
+        <li><%= erro %></li>
+      <% end %>
+    </ul>
+
+  </div>
+<% end %>
+
+<form class="cadastro" action="/cadastro" method="post" enctype="application/x-www-form-urlencoded">
+
+  <label for="nome">Nome de Usuário</label>
+  <input id="nome"
+         name="nome"
+         type="text"
+         <% if @auto_complete and @auto_complete[:nome] %>
+         value="<%= @auto_complete and @auto_complete[:nome] %>"
+         <% end %>
+         required>
+
+  <label for="email">Email</label>
+  <input id="email"
+         name="email"
+         type="email"
+         placeholder="email@examplo.com"
+         <% if @auto_complete and @auto_complete[:email] %>
+         value="<%= @auto_complete and @auto_complete[:email] %>"
+         <% end %>
+         required>
+
+  <label for="cpf">CPF</label>
+  <input id="cpf"
+         name="cpf"
+         type="text"
+         placeholder="0000000000"
+         pattern="[0-9]{11}"
+         minlength="11"
+         maxlength="11"
+         <% if @auto_complete and @auto_complete[:cpf] %>
+         value="<%= @auto_complete and @auto_complete[:cpf] %>"
+         <% end %>
+         required>
+
+  <label for="senha">Senha</label>
+  <input id="senha"
+         name="senha"
+         type="password"
+         minlength="8"
+         <% if @auto_complete and @auto_complete[:senha] %>
+         value="<%= @auto_complete and @auto_complete[:senha] %>"
+         <% end %>
+         required>
+
+  <label for="confirmar_senha">Senha</label>
+  <input id="confirmar_senha"
+         name="confirmar_senha"
+         type="password"
+         minlength="8"
+         <% if @auto_complete and @auto_complete[:confirmar_senha] %>
+         value="<%= @auto_complete and @auto_complete[:confirmar_senha] %>"
+         <% end %>
+         required>
+
+  <button class="form_button" type="submit">ENVIAR</button>
+</form>
