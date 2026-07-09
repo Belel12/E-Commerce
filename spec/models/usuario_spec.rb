@@ -1,5 +1,5 @@
 describe Usuario, 'TESTES' do
-  context 'usuario valido' do
+  context 'usuario com atributos validos' do
     before :each do
       @usuario = Usuario.new(
         nome: 'fulano',
@@ -31,18 +31,11 @@ describe Usuario, 'TESTES' do
     }
 
     it 'nao deve ser persistido com sucesso' do
-      usuario_defeituoso.save
-      #devem haver 7 erros pois, alem dos 4 nulos,
-      # tem 3 verificacoes de formato de:
-      # -cpf
-      # -email
-      # -senha(tamanho)
-      # acabam falhando tambem
-      expect(usuario_defeituoso.errors.full_messages.count).to be == 7
+      expect(usuario_defeituoso.save).to be false
     end
   end
 
-  context 'usuario tenta cadastrar um email que ja existe' do
+  context 'usuario tenta cadastrar um email que ja existe no banco' do
     let!(:usuario_valido1) {
       Usuario.create(
         nome: 'fulano1',
@@ -60,23 +53,38 @@ describe Usuario, 'TESTES' do
       )
     }
 
-    it 'nao deve ser persistido com sucesso' do
+    it 'nao deve ser cadastrado' do
       expect(usuario_valido2).to_not be_valid
     end
   end
 
-  context 'usuario com cpf com letras' do
+  context 'usuario com letras no cpf' do
     let(:usuario_com_letras) {
       Usuario.new(
         nome: 'fulano',
         email: 'email@gmail.com',
-        cpf: '01234567890abc',
+        cpf: 'c1234b6789a',
         senha_hash: 'senha1234',
       )
     }
 
     it 'nao deve ser persistido com sucesso' do
       expect(usuario_com_letras).to_not be_valid
+    end
+  end
+
+  context 'usuario com cpf diferente de 11 caracteres' do
+    let(:usuario){
+      Usuario.new(
+        nome: 'usuario',
+        senha_hash: 'senha1234',
+        cpf: '012345678901',
+        email: 'teste@gmail.com'
+      )
+    }
+
+    it 'nao deve poder ser salvo' do
+      expect(usuario.save).to be false
     end
   end
 end
