@@ -22,8 +22,8 @@ img.footer_image {
 div.avatar {
     border-radius: 50%;
     overflow: hidden;
-    width: 3em;
-    height: 3em;
+    width: 2.5em;
+    height: 2.5em;
     flex-shrink: 0;
 }
 
@@ -39,13 +39,6 @@ div.developers{
     background-color: darkred;
     text-align: center;
     margin: 10px;
-}
-
-div.vertical-footer-separador {
-    width: 10px;
-    height: 100%;
-    background-color: black;
-
 }
 
 div.developer_container {
