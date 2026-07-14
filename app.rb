@@ -17,7 +17,6 @@ class ECommerceApp < Sinatra::Base
   set :database, "db/ecommerce_#{ENV['RACK_ENV'] || 'development'}.sqlite3"
   set :adapter, :sqlite3
 
-  #TODO: mensagem se o vendedor apagou o produto no front
   #TODO: adicionar botão de voltar nas telas de erro erb :error_screen com request.referer
   #TODO: adicionar js na tela de cadastro e login e perfil? para customizar as mensagems do
   # navegador de invalidacao dos dados
@@ -68,7 +67,7 @@ class ECommerceApp < Sinatra::Base
       status 422
       return {
         message: 'Usuário inválido',
-        erros: novo_usuario.errors.full_messages.join('\n'),
+        erros: novo_usuario.errors.full_messages,
       }.to_json
     end
   end
@@ -267,8 +266,7 @@ class ECommerceApp < Sinatra::Base
 
   #ROTA PARA ACESSAR O PERFIL
   # PODENDO VISUALIZAR E EDITAR DADOS E SENHA
-  #TODO: validar se put tá tranquilo
-  put '/perfil' do
+  post '/perfil' do
     unless params[:tipo_alteracao].present?
       status 400
       @message = 'PARAMETRO DO TIPO DE ALTERAÇÃO FALTANDO'
