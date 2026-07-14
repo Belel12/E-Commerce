@@ -1,4 +1,4 @@
-const form = document.getElementsByClassName('login')[0]
+const form = document.getElementsByClassName('login-form')[0]
 const botao = document.getElementsByClassName('form-button')[0]
 const origin = window.location.origin
 botao.addEventListener('click', async () => {

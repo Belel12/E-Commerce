@@ -18,7 +18,7 @@ window.removerItemCarrinho = function(id_usuario, id_item){
 window.comprarItensCarrinho = function (id_usuario){
     const input_id_usuario = newHiddenInput('id_usuario',id_usuario)
 
-    const itens_carrinho = document.getElementsByClassName('item-carrinho')
+    const itens_carrinho = document.getElementsByClassName('cart-item')
     const quantidade_itens = document.getElementsByClassName('quantidade')
 
     const input_id_produto = []

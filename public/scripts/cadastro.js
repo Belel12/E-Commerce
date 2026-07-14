@@ -1,4 +1,4 @@
-const form = document.getElementsByClassName('cadastro')[0]
+const form = document.getElementsByClassName('register-form')[0]
 const botao = document.getElementsByClassName('form_button')[0]
 const origin = window.location.origin
 botao.addEventListener('click', async () => {
@@ -17,6 +17,6 @@ botao.addEventListener('click', async () => {
     }
     else{
         const json = await response.json()
-        alert(`ERRO\n${json['message']}\n-${json['erros']?.join('\n-')}`)
+        alert(`ERRO\n${json['message']}\n${json['erros']?.join('\n')}`)
     }
 })

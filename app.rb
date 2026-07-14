@@ -18,9 +18,7 @@ class ECommerceApp < Sinatra::Base
   set :adapter, :sqlite3
 
   #TODO: adicionar botão de voltar nas telas de erro erb :error_screen com request.referer
-  #TODO: adicionar js na tela de cadastro e login e perfil? para customizar as mensagems do
-  # navegador de invalidacao dos dados
-  #TODO: retornar página de erro ao invés de halt
+  #TODO: verificar erbs e halts
 
   #ROTA DA PAGINA INICIAL
   get '/' do
@@ -267,6 +265,7 @@ class ECommerceApp < Sinatra::Base
   #ROTA PARA ACESSAR O PERFIL
   # PODENDO VISUALIZAR E EDITAR DADOS E SENHA
   post '/perfil' do
+    content_type :json
     unless params[:tipo_alteracao].present?
       status 400
       @message = 'PARAMETRO DO TIPO DE ALTERAÇÃO FALTANDO'
@@ -275,33 +274,37 @@ class ECommerceApp < Sinatra::Base
     usuario = Usuario.find_by(id: params[:id_usuario])
     if usuario.nil?
       status 404
-      @message = 'USUÁRIO NÃO ENCONTRADO'
-      erb :error_screen
+      return {message: 'USUÁRIO NÃO ENCONTRADO'}.to_json
     end
     if params[:tipo_alteracao] == 'dados_conta'
-      usuario&.nome = params[:nome]
-      usuario&.cpf = params[:cpf]
-      usuario&.telefone = params[:telefone]
-      if usuario&.save
-        redirect "#{request.referer}&message=dados"
+      usuario.nome = params[:nome]
+      usuario.cpf = params[:cpf]
+      usuario.telefone = params[:telefone]
+      if usuario.save
+        status 200
+        return {message: 'Usuário alterado com sucesso'}.to_json
       else
-        @message = usuario&.errors&.full_messages&.join('\n')
         status 422
-        erb :error_screen
+        return {message: 'Erro ao salvar usuário',erros: usuario.errors.full_messages}.to_json
       end
     elsif params[:tipo_alteracao] == 'alterar_senha'
-      if Digest::MD5.hexdigest(params[:senha_atual].to_s) != usuario&.senha_hash
-        redirect "#{request.referer}&message=erro_senha_atual"
+      if Digest::MD5.hexdigest(params[:senha_atual].to_s) != usuario.senha_hash
+        status 422
+        return {message: 'Senha atual incorreta'}.to_json
       elsif params[:nova_senha] != params[:confirmar_nova_senha]
-        redirect "#{request.referer}&message=erro_senhas_diferentes"
+        status 422
+        return {message: 'Senhas são diferentes'}.to_json
       end
-      usuario&.senha_hash = params[:nova_senha]
-      if usuario&.save
-        redirect "#{request.referer}&message=senha"
+      usuario.senha_hash = params[:nova_senha]
+      if usuario.save
+        status 200
+        return {message: 'Senha alterada com sucesso'}.to_json
       else
         status 422
-        @message = usuario&.errors&.full_messages&.join('\n')
-        erb :error_screen
+        return {
+          message: 'Erro ao salvar nova senha',
+          erros: usuario.errors.full_messages
+        }.to_json
       end
     end
   end
@@ -314,7 +317,7 @@ class ECommerceApp < Sinatra::Base
       erb :error_screen
     end
     @id_usuario = params[:id_usuario]
-    @compras = Venda.where(comprador: params[:id_usuario]).includes(:vendedor)
+    @compras = Venda.where(comprador: params[:id_usuario]).includes(:vendedor).order(data: :desc)
     status 200
     erb :compras_usuario
   end
@@ -404,6 +407,7 @@ class ECommerceApp < Sinatra::Base
     end
   end
 
+  #ROTA DE API PARA DELETAR ITENS DE UMA VENDA PASSANDO OS IDs COMO PARÂMETRO
   delete '/itens_venda' do
     content_type :json
     unless params[:id_itens].present?

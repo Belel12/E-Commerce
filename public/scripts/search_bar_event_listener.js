@@ -1,9 +1,6 @@
 document.getElementById('buscar_button').addEventListener('click', () => {
-    const busca = document.getElementById("busca").value;
-    if(window.location.href.includes('?')){
-        window.location.href += `&busca=${busca}`
-    }
-    else{
-        window.location.href += `?busca=${busca}`
-    }
+    let busca = document.getElementById("busca").value;
+    if(busca !== ''){busca = `&busca=${busca}`}
+    const user_id = new URLSearchParams(window.location.search).get('id_usuario')
+    window.location.href = `${window.location.origin}/?id_usuario=${user_id}${busca}`
 })
