@@ -6,8 +6,8 @@ class Venda < ActiveRecord::Base
     pendente: 'pendente',
     paga: 'paga',
     enviada: 'enviada',
-    cancelada: 'cancelada',
     entregue: 'entregue',
+    cancelada: 'cancelada',
   }
 
   validates :status, presence: true, inclusion: { in: statuses.keys }
@@ -22,17 +22,12 @@ class Venda < ActiveRecord::Base
   has_many :itens_venda, class_name: 'ItemVenda', dependent: :destroy, foreign_key: :venda_id
   has_many :produtos, through: :itens_venda
 
-  before_save :atualizar_estoque, if: -> {self.status == 'paga'}
+  before_save :validar_venda,:atualizar_estoque, if: -> {self.status == 'paga'}
 
   def validar_venda
-    begin
-      verificar_produtos_apagados
-      verificar_inconsistencia_estoque
-    rescue ProdutoApagadoError
-      raise
-    rescue SemEstoqueError
-      raise
-    end
+    itens = self.itens_venda.includes(:produto)
+    verificar_produtos_apagados(itens)
+    verificar_inconsistencia_estoque(itens)
   end
   private
   def atualizar_estoque
@@ -42,7 +37,7 @@ class Venda < ActiveRecord::Base
     end
   end
 
-  def verificar_produtos_apagados
+  def verificar_produtos_apagados(itens_venda)
     produtos_apagados = Array.new
     itens_venda.each do |item|
       if item.produto.nil? then produtos_apagados << item end
@@ -52,7 +47,7 @@ class Venda < ActiveRecord::Base
     end
   end
 
-  def verificar_inconsistencia_estoque
+  def verificar_inconsistencia_estoque(itens_venda)
     itens_inconsistentes = Array.new
     itens_venda.each do |item|
       if item.produto.estoque < item.quantidade

@@ -60,8 +60,8 @@ describe ItemCarrinho, 'TESTES' do
       )
     }
 
-    it 'deve gerar SemEstoqueError' do
-      expect {item.save}.to raise_error(SemEstoqueError)
+    it 'deve gerar erro ao tentar salvar' do
+      expect {item.save}.to change{item.errors.full_messages.count}.by(1)
     end
   end
 

@@ -1,0 +1,28 @@
+<script src="scripts/alterar_status_venda.js" defer></script>
+<h2>Minhas Compras</h2>
+<% if @compras.count >0 %>
+  <div  class="lista_compras">
+    <% @compras.each do |compra| %>
+    <div class="compra" id="<%= compra.id %>">
+      <p class="id-compra">ID Compra: <%= compra.id %></p>
+      <p class="nome-vendedor">Vendedor: <%= compra.vendedor.nome %></p>
+      <p class="data-compra">Data: <%= compra.data %></p>
+      <p class="status-compra">Status: <%= compra.status %></p>
+      <p class="valor-total">Valor Total: <%= compra.valor_total %></p>
+      <a class="itens-compra"
+         target="_self"
+         href="/itens_venda?id_usuario=<%= @id_usuario %>&id_venda=<%= compra.id %>">Visualizar Itens</a>
+
+      <% if compra.status == 'pendente' %>
+        <button class="confirmar-pagamento-button" type="button" data-id-venda="<%= compra.id %>">Pagar</button>
+      <% end %>
+
+      <% if %w[pendente paga enviada].include?(compra.status) %>
+        <button class="cancelar-compra-button" type="button" data-id-venda="<%= compra.id %>">Cancelar Compra</button>
+      <% end %>
+    </div>
+    <% end %>
+  </div>
+<% else %>
+  <h3>Você ainda não tem compras</h3>
+<% end %>

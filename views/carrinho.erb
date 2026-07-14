@@ -1,0 +1,25 @@
+<script type="module" src="scripts/element_factory.js" defer></script>
+<script type="module" src="scripts/carrinho.js" defer></script>
+<div class="carrinho">
+  <h2>Carrinho</h2>
+  <% if !@itens_carrinho_usuario.nil? and @itens_carrinho_usuario.count > 0 %>
+    <% @itens_carrinho_usuario.each do |item| %>
+      <div class="item-carrinho" id="<%= item.produto.id %>">
+        <a target="_self" href="/produto?id_usuario=<%= @id_usuario %>&id_produto=<%= item.produto.id %>">
+          <%= item.produto.nome %>
+        </a>
+        <p class="quantidade" id="<%= item.quantidade %>">Quantidade: <%= item.quantidade %></p>
+        <p>Total: <%= item.produto.preco * item.quantidade %></p>
+        <button id="remover-button" onclick="removerItemCarrinho(
+            <%= @id_usuario %>,
+            <%= item.id %>
+          )">
+          REMOVER
+        </button>
+      </div>
+    <% end %>
+    <button id="comprar-button" onclick="comprarItensCarrinho(<%= @id_usuario %>)">Comprar Itens</button>
+  <% else %>
+    <h3>Você não possui itens no seu carrinho ainda</h3>
+  <% end %>
+</div>

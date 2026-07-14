@@ -1,22 +1,13 @@
+<script src="scripts/login.js" defer></script>
 <h2>Login</h2>
-<% if @erro %>
-  <p>Erro: <%= @erro %></p>
-<% end %>
-<form class="login" action="/login" method="post" enctype="application/x-www-form-urlencoded">
+<form class="login" action="/login">
   <label for="email">Email</label>
   <input id="email" name="email" type="email" placeholder="email@examplo.com" required>
 
   <label for="senha">Senha</label>
   <input id="senha" name="senha" type="password" minlength="8" required>
 
-  <button type="submit">Login</button>
+  <button class="form-button" type="button">Login</button>
 </form>
 
-<% if @usuario_recem_cadastrado %>
-  <script>
-      setTimeout(() => {
-          alert("Cadastro sucedido!");
-      }, 500);
-  </script>
-<% end %>
 

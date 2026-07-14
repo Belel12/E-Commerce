@@ -1,0 +1,11 @@
+<script src="scripts/botao_voltar.js" defer></script>
+<div class="itens_venda">
+  <% @itens_venda.each do |item| %>
+  <div class="item_venda">
+    <p class="nome-produto">Produto: <%= item.produto.nome %></p>
+    <p class="quantidade-produto">Quantidade: <%= item.quantidade %></p>
+    <p class="preco-unitario">Preço Unitário: <%= item.preco_unitario %></p>
+  </div>
+  <% end %>
+  <button type="button" class="go-back-button" id="<%= @url_voltar %>">Voltar</button>
+</div>

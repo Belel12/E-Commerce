@@ -1,0 +1,62 @@
+<div class="perfil">
+  <h2>Perfil</h2>
+  <form class="perfil" action="/perfil" method="post" enctype="application/x-www-form-urlencoded">
+    <fieldset class="dados-da-conta">
+      <legend>Dados da Conta</legend>
+
+
+      <input type="hidden" name="tipo_alteracao" value="dados_conta">
+      <input type="hidden" name="id_usuario" value="<%= @usuario.id %>">
+
+      <label for="nome">Nome:</label>
+      <input id="nome" type="text" name="nome" value="<%= @usuario.nome %>" required>
+
+      <label for="cpf">CPF:</label>
+      <input id="cpf"
+             name="cpf"
+             type="text"
+             value="<%= @usuario.cpf %>"
+             pattern="[0-9]{11}"
+             minlength="11"
+             maxlength="11"
+             required>
+
+      <label for="telefone">Telefone:</label>
+      <input id="telefone"
+             name="telefone"
+             type="text"
+             minlength="8"
+             value="<%= @usuario.telefone %>"
+             patten="(?:(^\\+\\d{2})?)(?:([1-9]{2})|([0-9]{3})?)(\\d{4,5}).?(\\d{4})">
+
+      <button type="submit">Salvar Alterações</button>
+    </fieldset>
+  </form>
+  <form class="perfil" action="/perfil" method="post" enctype="application/x-www-form-urlencoded">
+    <fieldset class="alterar-senha">
+      <legend>Alterar Senha</legend>
+
+      <input type="hidden" name="tipo_alteracao" value="alterar_senha">
+      <input type="hidden" name="id_usuario" value="<%= @usuario.id %>">
+
+      <label for="senha_atual">Senha Atual:</label>
+      <input id="senha_atual" type="password" name="senha_atual" minlength="8" required>
+
+      <label for="nova_senha">Nova Senha:</label>
+      <input id="nova_senha" type="password" name="nova_senha" minlength="8" required>
+
+      <label for="confirmar_nova_senha">Confirmar Nova Senha:</label>
+      <input id="confirmar_nova_senha" type="password" name="confirmar_nova_senha" minlength="8" required>
+
+      <button type="submit">Alterar Senha</button>
+    </fieldset>
+  </form>
+</div>
+<% if @message %>
+  <script defer>
+    setTimeout( () =>{
+        alert(<%= @message.to_json %>)
+    },200)
+  </script>
+<% end %>
+

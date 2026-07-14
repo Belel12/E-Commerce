@@ -1,6 +1,8 @@
 class ProdutoApagadoError < StandardError
-  def initialize(msg = '',produtos_apagados)
+
+  attr_reader :itens_produtos_apagados
+  def initialize(msg = '', itens_produtos_apagados)
     super msg
-    @produtos_apagados=produtos_apagados
+    @itens_produtos_apagados=itens_produtos_apagados
   end
 end

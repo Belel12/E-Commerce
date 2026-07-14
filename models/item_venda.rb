@@ -8,6 +8,7 @@ class ItemVenda < ActiveRecord::Base
   belongs_to :produto
   belongs_to :venda
 
+  before_save :validar_presenca_produto
   before_save :somar_total
   before_destroy :subtrair_total
 
@@ -18,6 +19,12 @@ class ItemVenda < ActiveRecord::Base
 
   def subtrair_total
     venda.update!(valor_total: venda.valor_total - preco_unitario * quantidade)
+  end
+
+  def validar_presenca_produto
+    if self.produto.nil?
+      self.errors.add(:produto,message: 'produto deste item não existe')
+    end
   end
 end
 

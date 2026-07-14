@@ -17,30 +17,41 @@ class ECommerceApp < Sinatra::Base
   set :database, "db/ecommerce_#{ENV['RACK_ENV'] || 'development'}.sqlite3"
   set :adapter, :sqlite3
 
+  #TODO: mensagem se o vendedor apagou o produto no front
+  #TODO: adicionar botão de voltar nas telas de erro erb :error_screen com request.referer
+  #TODO: adicionar js na tela de cadastro e login e perfil? para customizar as mensagems do
+  # navegador de invalidacao dos dados
+  #TODO: retornar página de erro ao invés de halt
+
   #ROTA DA PAGINA INICIAL
   get '/' do
     status 200
     @id_usuario = params[:id_usuario]
     #PEGA TODOS OS PRODUTOS QUE N PERTENCAM AQUELE USUARIO
     # CASO O USUARIO N TIVER LOGADO, APARECERA TUDO
-    @produtos = Produto.where.not(usuario: params[:id_usuario]).to_a
+    @produtos = Produto.where.not(usuario: params[:id_usuario])
+                .where(estoque: 1..)
+    if params[:busca].present?
+      busca = ActiveRecord::Base.sanitize_sql_like(params[:busca])
+      @produtos = @produtos.where("nome LIKE ?","%#{busca}%")
+    end
     erb :tela_inicial
   end
 
   #ROTAS DE CADASTRO E LOGIN
-  #TODO: adicionar input hidden para token de validacao basica em login e cadastro
-  #TODO: adicionar js na tela de cadastro e login para customizar as mensagems do
-  # navegador de invalidacao dos dados
+
+  #ROTA PARA TELA DE CADASTRO
   get '/cadastro' do
     status 200
     erb :cadastro
   end
 
+  #ROTA PARA PROCESSAR REQUISIÇÃO DE CADASTRO
   post '/cadastro' do
-    @erros = []
-    @auto_complete=params
+    content_type :json
     if params[:senha] != params[:confirmar_senha]
-      @erros << 'SENHAS NAO SAO IGUAIS'
+      status 422
+      return {message: 'Senhas são diferentes'}.to_json
     end
     novo_usuario = Usuario.new(
       nome: params[:nome].strip,
@@ -49,38 +60,370 @@ class ECommerceApp < Sinatra::Base
       cpf: params[:cpf].strip
     )
 
-    if novo_usuario.valid? and @erros.empty?
-      novo_usuario.save
-      redirect '/login?cadastro_redirect=true'
+    if novo_usuario.save
+      #redirect '/login?cadastro_redirect=true'
+      status 201
+      return {message: 'Usuário cadastrado com sucesso'}.to_json
     else
       status 422
-      @erros = @erros.concat novo_usuario.errors.full_messages.map {|error| error.upcase}
-      erb :cadastro
+      return {
+        message: 'Usuário inválido',
+        erros: novo_usuario.errors.full_messages.join('\n'),
+      }.to_json
     end
   end
-
+  # ROTA PARA A TELA DO LOGIN
   get '/login' do
     status 200
     @usuario_recem_cadastrado = params[:cadastro_redirect]
     erb :login
   end
 
+  #ROTA PARA PROCESSAMENTO DA REQUISIÇÃO
+  # DO LOGIN
   post '/login' do
+    content_type :json
     user = Usuario.find_by(email: params[:email].strip)
     if user
       if user.senha_hash == Digest::MD5.hexdigest(params[:senha].strip)
         status 200
-        redirect "/?id_usuario=#{user.id}"
+        return {user_id: user.id}.to_json
       else
-        status 401
-        @erro = 'SENHA INCORRETA, TENTE NOVAMENTE'
-        erb :login
+        status 422
+        return {message: 'Senha inválida'}.to_json
       end
     else
       status 404
-      @erro = 'EMAIL NAO CADASTRADO'
-      erb :login
+      return {message: 'Email não cadastrado'}.to_json
     end
+  end
+
+  #ROTAS DE PRODUTO
+  # ROTA PARA ACESSAR A PAGINA DE UM PRODUTO ESPECIFICO
+  get '/produto' do
+    @produto = Produto.find_by(id: params[:id_produto])
+    if @produto.nil?
+      halt 404, 'PRODUTO NAO ENCONTRADO'
+    end
+    @id_usuario = params[:id_usuario].empty?? nil : params[:id_usuario]
+    erb :'produto_inspect'
+  end
+
+  #ROTA DE ADICIONAR AO CARRINHO
+  post '/adicionar_carrinho' do
+    if params[:id_produto].nil? || params[:id_produto].empty?
+      halt 400, 'ID DE PRODUTO FALTANDO'
+    end
+    if params[:id_usuario].nil? || params[:id_usuario].empty?
+      halt 400, 'ID DE USUARIO FALTANDO'
+    end
+    if params[:quantidade].nil? || params[:quantidade].empty?
+      halt 400, 'QUANTIDADE DE PRODUTO FALTANDO'
+    end
+    produto = Produto.find_by(id: params[:id_produto])
+    if produto.nil?
+      halt 404, 'PRODUTO NAO ENCONTRADO'
+    end
+
+    usuario = Usuario.find_by(id: params[:id_usuario])
+    if usuario.nil?
+      halt 404, 'USUARIO NAO ENCONTRADO'
+    end
+
+    novo_item = ItemCarrinho.find_or_initialize_by(
+      usuario: usuario,
+      produto: produto
+    )
+    if novo_item.quantidade.nil?
+      novo_item.quantidade = params[:quantidade]
+    else
+      novo_item.quantidade += params[:quantidade].to_i
+      if novo_item.quantidade > produto&.estoque
+        novo_item.quantidade = produto&.estoque
+      end
+    end
+    if novo_item.save
+        status 201
+        redirect "/carrinho?id_usuario=#{usuario&.id}"
+    else
+      redirect "#{request.referer}&message="
+    end
+  end
+
+  #ROTA DO CARRINHO
+  get '/carrinho' do
+    usuario = Usuario.find_by(id: params[:id_usuario])
+    if usuario.nil?
+      halt 404, 'USUARIO NAO ENCONTRADO'
+    end
+    status 200
+    @id_usuario = usuario&.id
+    @itens_carrinho_usuario = usuario&.produtos_carrinho&.includes(:produto)
+    erb :carrinho
+  end
+
+  #TODO: alterar para delete
+  #ROTA PARA REMOVER ITEM DO CARRINHO
+  post '/remover_item_carrinho' do
+    item = ItemCarrinho.find_by(id: params[:id_item])
+    if item.nil?
+      halt 404, 'ITEM NAO ENCONTRADO'
+    end
+    if item&.destroy&.destroyed?
+      redirect back
+    else
+      halt 500, 'ERRO AO APAGAR ITEM'
+    end
+  end
+
+  #ROTA PARA REALIZAR COMPRA -> CRIAR VENDA
+  post '/comprar' do
+    comprador = Usuario.find_by(id: params[:id_usuario])
+    if comprador.nil?
+      halt 404, 'COMPRADOR NAO ENCONTRADO'
+    end
+
+    if params[:id_produto] and params[:ids_produto]
+      halt 400, 'PARÂMETROS ID EM EXCESSO'
+    end
+
+    if params[:quantidade] and params[:quantidade_produtos]
+      halt 400, 'PARÂMETROS QUANTIDADE EM EXCESSO'
+    end
+
+    quantidade_s = Array(params[:quantidade] || params[:quantidade_produtos])
+
+    produto_s = Array(params[:id_produto] || params[:ids_produto])
+    if produto_s.nil? || produto_s.empty?
+      halt 400, 'ID(s) DE PRODUTO FALTANDO'
+    end
+
+    if quantidade_s.nil? || quantidade_s.empty?
+      halt 400, 'QUANTIDADE FALTANDO'
+    end
+
+    if quantidade_s&.length != produto_s&.length
+      halt 400, 'QUANTIDADE DE IDS DIFERENTE DA DE QUANTIDADES'
+    end
+    produto_s = Produto
+                  .includes(:usuario)
+                  .where(id: produto_s)
+                  .group_by { |produto| produto.usuario}
+    if produto_s.nil?
+      halt 404, 'NENHUM PRODUTO ENCONTRADO PARA O(s) ID(s) PASSADOS'
+    end
+    i = -1
+    produto_s&.each do |vendedor, produtos|
+      i+=1
+      nova_venda = Venda.new(
+        comprador: comprador,
+        vendedor: vendedor,
+        data: Date.today,
+        status: 'pendente',
+        valor_total: 0
+      )
+      unless nova_venda.save
+        halt 422, nova_venda.errors.full_messages.join(', ')
+      end
+      produtos.each do |produto|
+        #se o item nao for salvo devido algum erro,
+        # ele será simplesmente ignorado
+        ItemVenda.create(
+          venda: nova_venda,
+          produto: produto,
+          preco_unitario: produto.preco,
+          quantidade: quantidade_s[i]
+        )
+      end
+    end
+    comprador&.produtos_carrinho&.destroy_all
+    redirect "/compras?id_usuario=#{params[:id_usuario]}"
+  end
+
+  #ROTA PARA PERFIL
+  get '/perfil' do
+    if params[:message] and !params[:message].blank?
+      case params[:message]
+      when 'dados'
+        @message = 'Dados atualizados com sucesso!'
+      when 'senha'
+        @message = 'Senha alterada com sucesso!'
+      when 'erro_senha_atual'
+        @message = "ERRO\nSENHA ATUAL INCORRETA"
+      when 'erro_senhas_diferentes'
+        @message = "ERRO\nSENHAS DIFERENTES"
+      else
+        @message = nil
+      end
+    end
+    @usuario = Usuario.find_by(id: params[:id_usuario])
+    if @usuario.nil?
+      halt 404, 'USUARIO NÃO ENCONTRADO'
+    end
+    @id_usuario = @usuario&.id #apenas para o layout mostrar a nav_bar correta
+    status 200
+    erb :perfil
+  end
+
+  #ROTA PARA ACESSAR O PERFIL
+  # PODENDO VISUALIZAR E EDITAR DADOS E SENHA
+  #TODO: validar se put tá tranquilo
+  put '/perfil' do
+    unless params[:tipo_alteracao].present?
+      status 400
+      @message = 'PARAMETRO DO TIPO DE ALTERAÇÃO FALTANDO'
+      erb :error_screen
+    end
+    usuario = Usuario.find_by(id: params[:id_usuario])
+    if usuario.nil?
+      status 404
+      @message = 'USUÁRIO NÃO ENCONTRADO'
+      erb :error_screen
+    end
+    if params[:tipo_alteracao] == 'dados_conta'
+      usuario&.nome = params[:nome]
+      usuario&.cpf = params[:cpf]
+      usuario&.telefone = params[:telefone]
+      if usuario&.save
+        redirect "#{request.referer}&message=dados"
+      else
+        @message = usuario&.errors&.full_messages&.join('\n')
+        status 422
+        erb :error_screen
+      end
+    elsif params[:tipo_alteracao] == 'alterar_senha'
+      if Digest::MD5.hexdigest(params[:senha_atual].to_s) != usuario&.senha_hash
+        redirect "#{request.referer}&message=erro_senha_atual"
+      elsif params[:nova_senha] != params[:confirmar_nova_senha]
+        redirect "#{request.referer}&message=erro_senhas_diferentes"
+      end
+      usuario&.senha_hash = params[:nova_senha]
+      if usuario&.save
+        redirect "#{request.referer}&message=senha"
+      else
+        status 422
+        @message = usuario&.errors&.full_messages&.join('\n')
+        erb :error_screen
+      end
+    end
+  end
+
+  #ROTA PARA VISUALIZAR COMPRAS DO USUARIO
+  get '/compras' do
+    unless params[:id_usuario].present?
+      @message='ERRO AO PROCURAR COMRPAS, USUÁRIO FALTANDO'
+      status 400
+      erb :error_screen
+    end
+    @id_usuario = params[:id_usuario]
+    @compras = Venda.where(comprador: params[:id_usuario]).includes(:vendedor)
+    status 200
+    erb :compras_usuario
+  end
+
+  #ROTA PARA VISUALIZAR OS ITENS DE UMA VENDA
+  get '/itens_venda' do
+    unless params[:id_venda].present?
+      @message = 'ID DA VENDA FALTANDO'
+      status 400
+      erb :error_screen
+    end
+    @venda = Venda.find_by(id: params[:id_venda])
+    if @venda.nil?
+      @message = 'VENDA NÃO ENCONTRADA'
+      status 404
+      erb :error_screen
+    end
+    @itens_venda = ItemVenda.where(venda: @venda).includes(:produto)
+    if @itens_venda.nil?
+      status 404
+      @message = 'VENDA SEM ITENS ASSOCIADOS'
+      erb :error_screen
+    end
+    @id_usuario = params[:id_usuario]
+    @url_voltar = request.referer
+    erb :itens_venda
+  end
+
+  #ROTA DE API PARA VALIDAR A SENHA
+  # DO USUARIO ANTES DE ALGUMA OPERAÇÃO
+  get '/verificar_senha' do
+    content_type :json
+    halt 400, {message: 'parametros incorretos'}.to_json unless params[:id_usuario].present? && params[:senha].present?
+    usuario = Usuario.find_by(id: params[:id_usuario])
+    halt  404, {message: 'usuario nao encontrado'}.to_json unless usuario
+    verificacao = Digest::MD5.hexdigest(params[:senha].strip) == usuario&.senha_hash
+    {verificacao: verificacao}.to_json
+  end
+
+  #ROTA DE API PARA ALTERAR O STATUS DE UMA VENDA,
+  # SEJA POR PARTE DO COMPRADOR OU DO VENDEDOR
+  put '/alterar_status_venda' do
+    dados = JSON.parse(request.body.read)
+    parametros_corretos = dados['id_venda'].present? && dados['novo_status'].present? && dados['id_usuario'].present?
+    halt 400, 'PARAMETROS INCORRETOS' unless parametros_corretos
+    usuario = Usuario.select(:id).find_by(id: dados['id_usuario'])
+    halt 404, 'USUARIO NÃO ENCONTRADO' if usuario.nil?
+    venda = Venda.find_by(id: dados['id_venda'])
+    halt 404, 'VENDA NÃO ENCONTRADA' if venda.nil?
+    if venda&.vendedor_id == usuario&.id
+      status_options = %i[enviada entregue]
+    elsif venda&.comprador_id == usuario&.id
+      status_options = %i[paga cancelada]
+    else
+      status_options == nil
+    end
+    halt 400, 'INCOMPATIBILIDADE ENTRE VENDA E USUÁRIO' if status_options.nil?
+    if status_options&.include?(dados['novo_status'].to_sym)
+      begin
+        venda.update(status: dados['novo_status'].to_sym)
+        status 200
+        return 'STATUS ALTERADO COM SUCESSO'
+      rescue SemEstoqueError => e
+        content_type :json
+        status 422
+        return {
+          message: 'Produtos sem estoque',
+          error_type: 'sem_estoque',
+          itens_id: e.itens_inconsistentes.map {|item| item.id}
+        }.to_json
+      rescue ProdutoApagadoError => e
+        #apaga todos os itens que possuem produtos apagados
+        e.itens_produtos_apagados.delete_all
+        # apaga a venda se tiver ficado sem itens
+        unless venda.itens_venda.exists?
+          venda.destroy
+        end
+        content_type :json
+        status 422
+        return {
+          message: 'Produtos sem estoque',
+          error_type: 'produto_apagado',
+        }.to_json
+      end
+    else
+      halt 403, 'ACESSO NÃO AUTORIZADO OU STATUS INVÁLIDO'
+    end
+  end
+
+  delete '/itens_venda' do
+    content_type :json
+    unless params[:id_itens].present?
+      status 400
+      return {message: 'id_vendas faltando'}.to_json
+    end
+    itens = ItemVenda.select(:id).where(id: params[:id_itens])
+    if itens.nil?
+      status 400
+      return {message: 'nenhum item encontrado para os ids passados'}.to_json
+    end
+    venda_associada = itens.first.venda
+    itens.destroy_all
+    unless venda_associada.itens_venda.exists?
+      venda_associada.destroy
+    end
+    status 204
+    return {message: 'Itens apagados'}.to_json
   end
 end
 

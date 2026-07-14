@@ -1,5 +1,4 @@
 require 'digest'
-
 class Usuario < ActiveRecord::Base
   validates :nome, presence: { message: 'É OBRIGATÓRIO' }
   validates :email, { presence: { message: 'É OBRIGATÓRIO' },
@@ -8,7 +7,8 @@ class Usuario < ActiveRecord::Base
   }
   validates :cpf, presence: { message: 'É OBRIGATÓRIO' },
                   format: { with: /\A\d+\z/, message: 'FORMATO INVÁLIDO'},
-                  length: { is: 11 , message: 'DEVE CONTER 11 DIGITOS'}
+                  length: { is: 11 , message: 'DEVE CONTER 11 DIGITOS'},
+                  uniqueness: { message: 'INVÁLIDO'}
   validates :senha_hash, { presence: { message: 'É OBRIGATÓRIA'},
                            length: { minimum: 8, message: 'DEVE TER NO MÍNIMO 8 CARACTERES'}
   }

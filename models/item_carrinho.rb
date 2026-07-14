@@ -11,12 +11,12 @@ class ItemCarrinho < ActiveRecord::Base
   validates :produto, uniqueness: { scope: :usuario }
   validates :quantidade, presence: true, numericality: { greater_than: 0 }
 
-  before_save :validar_estoque
+  before_validation :validar_estoque, if: -> {!produto.nil?}
 
   private
   def validar_estoque
     if self.quantidade > self.produto.estoque
-      raise SemEstoqueError.new("PRODUTO #{self.produto.nome} NAO TEM ESTOQUE SUFICIENTE",self.produto)
+      self.errors.add(:quantidade, message:"PRODUTO #{self.produto.nome} NAO TEM ESTOQUE SUFICIENTE")
     end
   end
 end
