@@ -1,11 +1,12 @@
+<link rel="stylesheet" href="css/produto_inspect.css">
 <script type="module" src="scripts/element_factory.js" defer></script>
 <script type="module" src="scripts/compra_e_carrinho.js" defer></script>
 <div class="produto-inspect">
   <h2><%= @produto.nome %></h2>
-  <p>Descrição: <%= @produto.descricao %></p>
-  <p>Preço: <%= @produto.preco %> R$</p>
-  <p>Estoque: <%= @produto.estoque %></p>
-  <p>Vendedor: <%= @produto.usuario.nome %></p>
+  <p><strong>Descrição:</strong> <%= @produto.descricao %></p>
+  <p><strong>Preço:</strong> <%= @produto.preco %> R$</p>
+  <p><strong>Estoque:</strong> <%= @produto.estoque %></p>
+  <p><strong>Vendedor:</strong> <%= @produto.usuario.nome %></p>
 </div>
 <div class="buy-options">
   <% if !@id_usuario.nil? %>

@@ -8,15 +8,16 @@
     <link rel="stylesheet" href="css/layout.css">
 </head>
   <body>
-    <nav>
+    <nav class="main-navbar">
       <h1>E-Commerce</h1>
+      <div class="navbar-logo"></div>
       <% if @id_usuario %>
         <%= erb :'layout_components/_nav_options_logged' %>
       <% else %>
         <%= erb :'layout_components/_nav_options_not_logged' %>
       <% end %>
     </nav>
-    <main>
+    <main class="page-container">
       <%= yield %>
     </main>
     <footer>

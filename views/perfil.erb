@@ -1,6 +1,8 @@
-<div class="perfil">
+<link rel="stylesheet" href="css/perfil.css">
+<script src="scripts/perfil_change_check.js" defer></script>
+<div class="profile-card">
   <h2>Perfil</h2>
-  <form class="perfil" action="/perfil" method="post" enctype="application/x-www-form-urlencoded">
+  <form id="dados-form" class="perfil-form" action="/perfil" method="post" enctype="application/x-www-form-urlencoded">
     <fieldset class="dados-da-conta">
       <legend>Dados da Conta</legend>
 
@@ -32,7 +34,7 @@
       <button type="submit">Salvar Alterações</button>
     </fieldset>
   </form>
-  <form class="perfil" action="/perfil" method="post" enctype="application/x-www-form-urlencoded">
+  <form id="senha-form" class="perfil-form" action="/perfil" method="post" enctype="application/x-www-form-urlencoded">
     <fieldset class="alterar-senha">
       <legend>Alterar Senha</legend>
 
@@ -52,11 +54,4 @@
     </fieldset>
   </form>
 </div>
-<% if @message %>
-  <script defer>
-    setTimeout( () =>{
-        alert(<%= @message.to_json %>)
-    },200)
-  </script>
-<% end %>
 

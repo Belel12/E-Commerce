@@ -1,0 +1,153 @@
+/*==================================================
+=                     PERFIL                       =
+==================================================*/
+
+.profile-card{
+
+    max-width:900px;
+
+    margin:0 auto;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:35px;
+
+    animation:fadeIn .4s ease;
+
+}
+
+/*==================================================
+=                    FORMULÁRIOS                   =
+==================================================*/
+
+.perfil-form{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.perfil-form fieldset{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+
+}
+
+/*==================================================
+=                     LEGEND                       =
+==================================================*/
+
+.perfil-form legend{
+
+    font-size:1.15rem;
+
+}
+
+/*==================================================
+=                     LABELS                       =
+==================================================*/
+
+.perfil-form label{
+
+    font-weight:600;
+
+    margin-bottom:4px;
+
+}
+
+/*==================================================
+=                     INPUTS                       =
+==================================================*/
+
+.perfil-form input{
+
+    margin-bottom:4px;
+
+}
+
+.perfil-form input:focus{
+
+    transform:translateY(-1px);
+
+}
+
+/*==================================================
+=                    BOTÕES                        =
+==================================================*/
+
+.perfil-form button{
+
+    margin-top:12px;
+
+    align-self:flex-start;
+
+    min-width:220px;
+
+}
+
+/*==================================================
+=              PRIMEIRO FIELDSET                   =
+==================================================*/
+
+.dados-da-conta{
+
+    border-left:6px solid var(--primary);
+
+}
+
+/*==================================================
+=             ALTERAÇÃO DE SENHA                   =
+==================================================*/
+
+.alterar-senha{
+
+    border-left:6px solid var(--secondary);
+
+}
+
+/*==================================================
+=                 DIVISÃO VISUAL                   =
+==================================================*/
+
+.dados-da-conta,
+.alterar-senha{
+
+    transition:var(--transition);
+
+}
+
+.dados-da-conta:hover,
+.alterar-senha:hover{
+
+    box-shadow:var(--shadow-hover);
+
+}
+
+/*==================================================
+=                RESPONSIVO                        =
+==================================================*/
+
+@media(max-width:700px){
+
+    .profile-card{
+
+        gap:24px;
+
+    }
+
+    .perfil-form button{
+
+        width:100%;
+
+        align-self:stretch;
+
+    }
+
+}

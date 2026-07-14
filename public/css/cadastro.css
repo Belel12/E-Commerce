@@ -1,0 +1,149 @@
+/*==================================================
+=                   CADASTRO                       =
+==================================================*/
+
+.register-form{
+
+    width:min(560px,100%);
+
+    margin:40px auto;
+
+    background:var(--surface);
+
+    padding:38px;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+    animation:fadeIn .4s ease;
+
+}
+
+.register-form::before{
+
+    content:"";
+
+    width:80px;
+
+    height:6px;
+
+    margin:0 auto 12px auto;
+
+    border-radius:999px;
+
+    background:linear-gradient(
+            90deg,
+            var(--primary),
+            var(--secondary)
+    );
+
+}
+
+/*==================================================
+=                     LABELS                       =
+==================================================*/
+
+.register-form label{
+
+    font-size:.95rem;
+
+    font-weight:600;
+
+    margin-bottom:4px;
+
+}
+
+/*==================================================
+=                     INPUTS                       =
+==================================================*/
+
+.register-form input{
+
+    margin-bottom:6px;
+
+}
+
+.register-form input::placeholder{
+
+    color:#9b9b9b;
+
+}
+
+.register-form input:focus{
+
+    transform:translateY(-1px);
+
+}
+
+/*==================================================
+=                     BOTÃO                        =
+==================================================*/
+
+.register-form button{
+
+    margin-top:16px;
+
+    font-size:1rem;
+
+    letter-spacing:.4px;
+
+}
+
+/*==================================================
+=                 ORGANIZAÇÃO                      =
+==================================================*/
+
+.register-form>*{
+
+    width:100%;
+
+}
+
+/*==================================================
+=              VALIDAÇÃO VISUAL                    =
+==================================================*/
+
+.register-form input:valid{
+
+    border-color:#d9d9d9;
+
+}
+
+.register-form input:invalid:not(:placeholder-shown){
+
+    border-color:#d9534f;
+
+}
+
+/*==================================================
+=                  RESPONSIVO                      =
+==================================================*/
+
+@media(max-width:700px){
+
+    .register-form{
+
+        padding:28px;
+
+    }
+
+}
+
+@media(max-width:500px){
+
+    .register-form{
+
+        padding:22px;
+
+        margin:20px auto;
+
+    }
+
+}

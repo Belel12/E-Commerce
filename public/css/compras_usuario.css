@@ -1,0 +1,282 @@
+/*==================================================
+=                MINHAS COMPRAS                    =
+==================================================*/
+
+.lista_compras{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:24px;
+
+    max-width:950px;
+
+    margin:35px auto;
+
+}
+
+/*==================================================
+=                 CARD DA COMPRA                   =
+==================================================*/
+
+.compra{
+
+    background:var(--surface);
+
+    border-radius:var(--radius);
+
+    padding:28px;
+
+    box-shadow:var(--shadow);
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+    transition:var(--transition);
+
+}
+
+.compra:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:var(--shadow-hover);
+
+}
+
+/*==================================================
+=               INFORMAÇÕES                        =
+==================================================*/
+
+.compra p{
+
+    margin:0;
+
+}
+
+.id-compra{
+
+    font-weight:700;
+
+    color:var(--primary);
+
+}
+
+.nome-vendedor{
+
+    font-weight:600;
+
+}
+
+.data-compra{
+
+    color:var(--text-light);
+
+}
+
+.valor-total{
+
+    font-size:1.2rem;
+
+    font-weight:700;
+
+    color:var(--primary);
+
+}
+
+/*==================================================
+=                    STATUS                        =
+==================================================*/
+
+.status-compra{
+
+    display:inline-block;
+
+    width:fit-content;
+
+    padding:
+
+            6px
+            14px;
+
+    border-radius:999px;
+
+    background:#ececec;
+
+    font-weight:600;
+
+}
+
+/*==================================================
+=                  LINK ITENS                      =
+==================================================*/
+
+.itens-compra{
+
+    width:fit-content;
+
+    margin-top:6px;
+
+    font-weight:600;
+
+    text-decoration:underline;
+
+    text-underline-offset:3px;
+
+    color:var(--primary);
+
+}
+
+.itens-compra:hover{
+
+    color:var(--primary-light);
+
+}
+
+/*==================================================
+=                    BOTÕES                        =
+==================================================*/
+
+.confirmar-pagamento-button{
+
+    margin-top:8px;
+
+    background:var(--success);
+
+}
+
+.confirmar-pagamento-button:hover{
+
+    background:#256d2a;
+
+}
+
+.cancelar-compra-button{
+
+    background:var(--danger);
+
+}
+
+.cancelar-compra-button:hover{
+
+    background:#b71c1c;
+
+}
+
+.confirmar-pagamento-button,
+.cancelar-compra-button{
+
+    width:fit-content;
+
+}
+
+/*==================================================
+=             SEM COMPRAS                          =
+==================================================*/
+
+.lista_compras+h3{
+
+    text-align:center;
+
+    padding:50px 25px;
+
+    background:var(--surface);
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+    color:var(--text-light);
+
+    font-weight:500;
+
+}
+
+/*==================================================
+=                RESPONSIVO                        =
+==================================================*/
+
+@media(max-width:700px){
+
+    .compra{
+
+        padding:20px;
+
+    }
+
+    .confirmar-pagamento-button,
+    .cancelar-compra-button{
+
+        width:100%;
+
+    }
+
+}
+
+/*==================================================
+=                    STATUS                        =
+==================================================*/
+
+.status-compra{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    width:fit-content;
+
+    padding:8px 16px;
+
+    border-radius:999px;
+
+    font-weight:600;
+
+    color:white;
+
+}
+
+/*---------------- PENDENTE ----------------*/
+
+.status-pendente{
+
+    background:#F4B400;
+
+}
+
+/*---------------- PAGA ----------------*/
+
+.status-paga{
+
+    background:#2E7D32;
+
+}
+
+/*---------------- ENVIADA ----------------*/
+
+.status-enviada{
+
+    background:#1976D2;
+
+}
+
+/*---------------- ENTREGUE ----------------*/
+
+.status-entregue{
+
+    background:#1565C0;
+
+}
+
+/*---------------- CANCELADA ----------------*/
+
+.status-cancelada{
+
+    background:#C62828;
+
+}

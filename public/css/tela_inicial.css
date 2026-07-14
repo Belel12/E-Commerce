@@ -1,0 +1,313 @@
+/*==================================================
+=                TELA INICIAL                      =
+==================================================*/
+
+.products-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+        repeat(
+            auto-fill,
+            minmax(260px,1fr)
+        );
+
+    gap:28px;
+
+    margin-top:35px;
+
+    list-style:none;
+
+    padding:0;
+
+}
+
+/*==================================================
+=                PRODUCT CARD                      =
+==================================================*/
+
+.product-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    gap:14px;
+
+    min-height:180px;
+
+    padding:22px;
+
+    border-radius:18px;
+
+    background:var(--surface);
+
+    box-shadow:var(--shadow);
+
+    transition:var(--transition);
+
+    overflow:hidden;
+
+    position:relative;
+
+}
+
+.product-card:hover{
+
+    transform:
+
+            translateY(-6px);
+
+    box-shadow:
+
+            var(--shadow-hover);
+
+}
+
+/* barra superior */
+
+.product-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:0;
+
+    width:100%;
+
+    height:6px;
+
+    background:
+
+            linear-gradient(
+                    90deg,
+                    var(--primary),
+                    var(--secondary)
+            );
+
+}
+
+/*==================================================
+=              TEXTO DOS PRODUTOS                  =
+==================================================*/
+
+.product-card p{
+
+    margin:0;
+
+}
+
+.product-card p:first-child{
+
+    font-size:1.1rem;
+
+    font-weight:700;
+
+    color:var(--text);
+
+}
+
+.product-card p:last-child{
+
+    margin-top:auto;
+
+    font-size:1.25rem;
+
+    font-weight:700;
+
+    color:var(--primary);
+
+}
+
+/*==================================================
+=                 LINK PRODUTO                     =
+==================================================*/
+
+.product-link{
+
+    color:inherit;
+
+    text-decoration:underline;
+
+    text-decoration-thickness:1.5px;
+
+    text-underline-offset:3px;
+
+}
+
+.product-link:hover{
+
+    color:var(--primary);
+
+}
+
+/*==================================================
+=                 SEARCH BAR                       =
+==================================================*/
+
+fieldset{
+
+    margin:35px auto;
+
+    max-width:900px;
+
+}
+
+fieldset label{
+
+    margin-bottom:10px;
+
+}
+
+fieldset{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+}
+
+fieldset input{
+
+    flex:1;
+
+    min-width:420px;
+
+}
+
+#buscar_button{
+
+    min-width:140px;
+
+}
+
+/*==================================================
+=                  HEADERS                         =
+==================================================*/
+
+h3{
+
+    text-align:center;
+
+    margin-top:10px;
+
+    color:var(--text-light);
+
+    font-weight:500;
+
+}
+
+/*==================================================
+=                 EMPTY STATE                      =
+==================================================*/
+
+.products-grid:empty{
+
+    display:none;
+
+}
+
+.empty-products{
+
+    text-align:center;
+
+    padding:60px 30px;
+
+    background:white;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+}
+
+/*==================================================
+=                PRODUCT PRICE                     =
+==================================================*/
+
+.product-card p:last-child{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.product-card p:last-child::before{
+
+    content:"💰";
+
+    font-size:1rem;
+
+}
+
+/*==================================================
+=              HOVER ANIMATION                     =
+==================================================*/
+
+.product-card:hover .product-link{
+
+    color:var(--primary);
+
+}
+
+/*==================================================
+=               RESPONSIVE                         =
+==================================================*/
+
+@media(max-width:900px){
+
+    .products-grid{
+
+        grid-template-columns:
+
+            repeat(
+                auto-fill,
+                minmax(230px,1fr)
+            );
+
+    }
+
+}
+
+@media(max-width:600px){
+
+    fieldset{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+    #buscar_button{
+
+        width:100%;
+
+    }
+
+    .products-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .product-card{
+
+        min-height:auto;
+
+    }
+
+}

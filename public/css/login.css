@@ -1,0 +1,129 @@
+/*==================================================
+=                     LOGIN                        =
+==================================================*/
+
+.login-form{
+
+    width:min(430px,100%);
+
+    margin:40px auto;
+
+    background:var(--surface);
+
+    padding:36px;
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--shadow);
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+    animation:fadeIn .4s ease;
+
+}
+
+.login-form label{
+
+    margin-bottom:4px;
+
+    font-size:.95rem;
+
+}
+
+.login-form input{
+
+    margin-bottom:6px;
+
+}
+
+.login-form button{
+
+    margin-top:12px;
+
+}
+
+.login-form button:hover{
+
+    width:100%;
+
+}
+
+.login-form::before{
+
+    content:"";
+
+    width:70px;
+
+    height:6px;
+
+    margin:0 auto 10px auto;
+
+    border-radius:999px;
+
+    background:linear-gradient(
+            90deg,
+            var(--primary),
+            var(--secondary)
+    );
+
+}
+
+.login-form input[type="email"]{
+
+    text-transform:lowercase;
+
+}
+
+.login-form input::placeholder{
+
+    color:#9a9a9a;
+
+}
+
+.login-form input:focus{
+
+    transform:translateY(-1px);
+
+}
+
+.login-form button{
+
+    font-size:1rem;
+
+    letter-spacing:.5px;
+
+}
+
+.login-form + p{
+
+    margin-top:18px;
+
+    text-align:center;
+
+}
+
+.login-form + p a{
+
+    font-weight:600;
+
+}
+
+/*==================================================
+=                  RESPONSIVO                      =
+==================================================*/
+
+@media(max-width:600px){
+
+    .login-form{
+
+        padding:24px;
+
+        margin:20px auto;
+
+    }
+
+}
