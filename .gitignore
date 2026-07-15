@@ -7,9 +7,10 @@
 node_modules/
 /vendor/
 
-#banco de desenvolvimento
+#bancos
 db/schema.rb
 db/ecommerce.sqlite3
 db/ecommerce_dev.sqlite3
 db/ecommerce_test.sqlite3
+spec/temp/
 
