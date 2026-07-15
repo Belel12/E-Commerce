@@ -23,7 +23,7 @@ formDados.addEventListener('submit', async event => {
         }
         else{
             const json = await response.json()
-            alert(`ERRO\n${json['message']}\n${json['erros']?.join('\n')}`)
+            alert(`ERRO\n${json['message']}\n${json['erros']?.join('\n') || ''}`)
         }
     }
 })
@@ -51,7 +51,7 @@ formSenha.addEventListener('submit',async event => {
         }
         else{
             const json = await response.json()
-            alert(`ERRO\n${json['message']}\n${json['erros']?.join('\n')}`)
+            alert(`ERRO\n${json['message']}\n${json['erros']?.join('\n') || ''}`)
         }
     }
 })
