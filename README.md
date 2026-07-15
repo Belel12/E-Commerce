@@ -2,17 +2,17 @@
 
 ### Uma aplicação de eCommerce implementada em ruby utilizando o framework `Sinatra` para a disciplina de Programação Web.
 
-#### Dependências
->* ruby ^3.x
->* gema bundle instalada
->  * você pode instalar rodando o comando `gem install bundler` no terminal
+### Dependências
+* ruby ^3.x
+* gema bundle instalada
+  * você pode instalar rodando o comando `gem install bundler` no terminal
 
 ### Comandos Úteis
->* **Construir o banco de dados**: `bundle exec rake build`
->* **Apagar o banco existente**: `bundle exec rake db:drop`
->* **Popular o banco de desenvolvimento com tuplas artificiais**: `bundle exec rake db:seed`
->* **Executar suíte de testes completa**: `bundle exec rspec`
->* **Iniciar servidor da aplicação**: `bundle exec rackup`
+* **Construir o banco de dados**: `bundle exec rake build`
+* **Apagar o banco existente**: `bundle exec rake db:drop`
+* **Popular o banco de desenvolvimento com tuplas artificiais**: `bundle exec rake db:seed`
+* **Executar suíte de testes completa**: `bundle exec rspec`
+* **Iniciar servidor da aplicação**: `bundle exec rackup`
 
 ### Ambiente do aplicativo
 O ambiente do aplicativo pode ser configurado dentro do código do `app.rb` em:
