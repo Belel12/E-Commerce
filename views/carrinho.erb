@@ -11,15 +11,11 @@
         </a>
         <p class="quantidade" id="<%= item.quantidade %>"><strong>Quantidade:</strong> <%= item.quantidade %></p>
         <p>Total: <%= item.produto.preco * item.quantidade %></p>
-        <button class="remover-button" onclick="removerItemCarrinho(
-            <%= @id_usuario %>,
-            <%= item.id %>
-          )">
-          REMOVER
-        </button>
+        <!-- aqui -->
+        <button class="remover-button" id="<%= item.id %>">REMOVER</button>
       </div>
     <% end %>
-    <button id="comprar-button" onclick="comprarItensCarrinho(<%= @id_usuario %>)">Comprar Itens</button>
+    <button id="comprar-button">Comprar Itens</button>
   <% else %>
     <h3>Você não possui itens no seu carrinho ainda</h3>
   <% end %>

@@ -156,17 +156,17 @@ class ECommerceApp < Sinatra::Base
     erb :carrinho
   end
 
-  #TODO: alterar para delete
   #ROTA PARA REMOVER ITEM DO CARRINHO
-  post '/remover_item_carrinho' do
+  delete '/remover_item_carrinho' do
+    content_type :json
     item = ItemCarrinho.find_by(id: params[:id_item])
     if item.nil?
-      halt 404, 'ITEM NAO ENCONTRADO'
+      halt 404, {message: 'Item não encontrado'}.to_json
     end
-    if item&.destroy&.destroyed?
-      redirect back
+    if item.destroy.destroyed?
+      halt 204, {message: 'Item deletado com sucesso'}.to_json
     else
-      halt 500, 'ERRO AO APAGAR ITEM'
+      halt 422, {message: 'Erro ao apagar item',erros: item.errors.full_messages}.to_json
     end
   end
 
