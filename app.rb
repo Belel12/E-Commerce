@@ -35,8 +35,6 @@ class ECommerceApp < Sinatra::Base
     erb :tela_inicial
   end
 
-  #ROTAS DE CADASTRO E LOGIN
-
   #ROTA PARA TELA DE CADASTRO
   get '/cadastro' do
     status 200
@@ -377,12 +375,10 @@ class ECommerceApp < Sinatra::Base
     if status_options&.include?(dados['novo_status'].to_sym)
       begin
         venda.update(status: dados['novo_status'].to_sym)
-        status 200
-        return 'STATUS ALTERADO COM SUCESSO'
+        halt 200, 'STATUS ALTERADO COM SUCESSO'
       rescue SemEstoqueError => e
         content_type :json
-        status 422
-        return {
+        halt 422, {
           message: 'Produtos sem estoque',
           error_type: 'sem_estoque',
           itens_id: e.itens_inconsistentes.map {|item| item.id}
@@ -395,8 +391,7 @@ class ECommerceApp < Sinatra::Base
           venda.destroy
         end
         content_type :json
-        status 422
-        return {
+        halt 422, {
           message: 'Produtos sem estoque',
           error_type: 'produto_apagado',
         }.to_json
@@ -410,21 +405,18 @@ class ECommerceApp < Sinatra::Base
   delete '/itens_venda' do
     content_type :json
     unless params[:id_itens].present?
-      status 400
-      return {message: 'id_vendas faltando'}.to_json
+      halt 400, {message: 'id_vendas faltando'}.to_json
     end
     itens = ItemVenda.select(:id).where(id: params[:id_itens])
     if itens.nil?
-      status 400
-      return {message: 'nenhum item encontrado para os ids passados'}.to_json
+      halt 400, {message: 'nenhum item encontrado para os ids passados'}.to_json
     end
     venda_associada = itens.first.venda
     itens.destroy_all
     unless venda_associada.itens_venda.exists?
       venda_associada.destroy
     end
-    status 204
-    return {message: 'Itens apagados'}.to_json
+    halt 204, {message: 'Itens apagados'}.to_json
   end
 end
 
