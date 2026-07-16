@@ -45,8 +45,7 @@ class ECommerceApp < Sinatra::Base
   post '/cadastro' do
     content_type :json
     if params[:senha] != params[:confirmar_senha]
-      status 422
-      return {message: 'Senhas são diferentes'}.to_json
+      halt 422, {message: 'Senhas são diferentes'}.to_json
     end
     novo_usuario = Usuario.new(
       nome: params[:nome].strip,
@@ -57,11 +56,9 @@ class ECommerceApp < Sinatra::Base
 
     if novo_usuario.save
       #redirect '/login?cadastro_redirect=true'
-      status 201
-      return {message: 'Usuário cadastrado com sucesso'}.to_json
+      halt 201,{message: 'Usuário cadastrado com sucesso'}.to_json
     else
-      status 422
-      return {
+      halt 422,{
         message: 'Usuário inválido',
         erros: novo_usuario.errors.full_messages,
       }.to_json
@@ -81,15 +78,12 @@ class ECommerceApp < Sinatra::Base
     user = Usuario.find_by(email: params[:email].strip)
     if user
       if user.senha_hash == Digest::MD5.hexdigest(params[:senha].strip)
-        status 200
-        return {user_id: user.id}.to_json
+        halt 200, {user_id: user.id}.to_json
       else
-        status 422
-        return {message: 'Senha inválida'}.to_json
+        halt 422, {message: 'Senha inválida'}.to_json
       end
     else
-      status 404
-      return {message: 'Email não cadastrado'}.to_json
+      halt 404, {message: 'Email não cadastrado'}.to_json
     end
   end
 
@@ -270,35 +264,28 @@ class ECommerceApp < Sinatra::Base
     end
     usuario = Usuario.find_by(id: params[:id_usuario])
     if usuario.nil?
-      status 404
-      return {message: 'USUÁRIO NÃO ENCONTRADO'}.to_json
+      halt 404,{message: 'USUÁRIO NÃO ENCONTRADO'}.to_json
     end
     if params[:tipo_alteracao] == 'dados_conta'
       usuario.nome = params[:nome]
       usuario.cpf = params[:cpf]
       usuario.telefone = params[:telefone]
       if usuario.save
-        status 200
-        return {message: 'Usuário alterado com sucesso'}.to_json
+        halt 200, {message: 'Usuário alterado com sucesso'}.to_json
       else
-        status 422
-        return {message: 'Erro ao salvar usuário',erros: usuario.errors.full_messages}.to_json
+        halt 422, {message: 'Erro ao salvar usuário',erros: usuario.errors.full_messages}.to_json
       end
     elsif params[:tipo_alteracao] == 'alterar_senha'
       if Digest::MD5.hexdigest(params[:senha_atual].to_s) != usuario.senha_hash
-        status 422
-        return {message: 'Senha atual incorreta'}.to_json
+        halt 422,{message: 'Senha atual incorreta'}.to_json
       elsif params[:nova_senha] != params[:confirmar_nova_senha]
-        status 422
-        return {message: 'Senhas são diferentes'}.to_json
+        halt 422, {message: 'Senhas são diferentes'}.to_json
       end
       usuario.senha_hash = params[:nova_senha]
       if usuario.save
-        status 200
-        return {message: 'Senha alterada com sucesso'}.to_json
+        halt 200,{message: 'Senha alterada com sucesso'}.to_json
       else
-        status 422
-        return {
+        halt 422, {
           message: 'Erro ao salvar nova senha',
           erros: usuario.errors.full_messages
         }.to_json
