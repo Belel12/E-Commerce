@@ -1,6 +1,5 @@
 <link rel="stylesheet" href="css/produto_inspect.css">
-<script type="module" src="scripts/element_factory.js" defer></script>
-<script type="module" src="scripts/compra_e_carrinho.js" defer></script>
+<script src="scripts/compra_e_carrinho.js" defer></script>
 <div class="produto-inspect">
   <h2><%= @produto.nome %></h2>
   <p><strong>Descrição:</strong> <%= @produto.descricao %></p>
@@ -10,14 +9,8 @@
 </div>
 <div class="buy-options">
   <% if !@id_usuario.nil? %>
-    <button id="comprar"
-            onclick="comprarAdicionarCarrinho(<%= @id_usuario.to_s %>,<%= @produto.id.to_s %>,'comprar')">
-      COMPRAR
-    </button>
-    <button id="adicionar-carrinho"
-            onclick="comprarAdicionarCarrinho(<%= @id_usuario.to_s %>,<%= @produto.id.to_s %>,'carrinho')">
-      Adicionar ao Carrinho
-    </button>
+    <button id="comprar" data-id-produto="<%= @produto.id %>">COMPRAR</button>
+    <button id="adicionar-carrinho" data-id-produto="<%= @produto.id %>">Adicionar ao Carrinho</button>
     <label for="quantidade">Quantidade</label>
     <input id="quantidade" name="quantidade" type="number" max="<%= @produto.estoque %>" min="1" value="1">
   <% else %>
