@@ -22,7 +22,8 @@ class Venda < ActiveRecord::Base
   has_many :itens_venda, class_name: 'ItemVenda', dependent: :destroy, foreign_key: :venda_id
   has_many :produtos, through: :itens_venda
 
-  before_save :validar_venda,:atualizar_estoque, if: -> {self.status == 'paga'}
+  before_save :validar_venda
+  before_save :atualizar_estoque
 
   def validar_venda
     itens = self.itens_venda.includes(:produto)
@@ -31,10 +32,18 @@ class Venda < ActiveRecord::Base
   end
   private
   def atualizar_estoque
-    itens_venda.each do |item|
-      produto = item.produto
-      produto.update! estoque: produto.estoque-item.quantidade
+    if status_was == 'pendente' && status == 'paga'
+      itens_venda.each do |item|
+        produto = item.produto
+        produto.update! estoque: produto.estoque-item.quantidade
+      end
+    elsif status_was == 'paga' && status == 'cancelada'
+      itens_venda.each do |item|
+        produto = item.produto
+        produto&.update! estoque: item.quantidade + produto&.estoque
+      end
     end
+
   end
 
   def verificar_produtos_apagados(itens_venda)
