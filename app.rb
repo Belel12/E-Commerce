@@ -108,42 +108,41 @@ class ECommerceApp < Sinatra::Base
 
   #ROTA DE ADICIONAR AO CARRINHO
   post '/adicionar_carrinho' do
-    if params[:id_produto].nil? || params[:id_produto].empty?
-      halt 400, 'ID DE PRODUTO FALTANDO'
-    end
-    if params[:id_usuario].nil? || params[:id_usuario].empty?
-      halt 400, 'ID DE USUARIO FALTANDO'
-    end
-    if params[:quantidade].nil? || params[:quantidade].empty?
-      halt 400, 'QUANTIDADE DE PRODUTO FALTANDO'
+    content_type :json
+    unless params[:id_produto].present? && params[:id_produto].present? && params[:quantidade].present?
+      halt 400, {message: 'Parâmetros faltando'}.to_json
     end
     produto = Produto.find_by(id: params[:id_produto])
     if produto.nil?
-      halt 404, 'PRODUTO NAO ENCONTRADO'
+      halt 404, {message: 'Produto não encontrado'}.to_json
     end
 
     usuario = Usuario.find_by(id: params[:id_usuario])
     if usuario.nil?
-      halt 404, 'USUARIO NAO ENCONTRADO'
+      halt 404, {message: 'Usuário não encontrado'}.to_json
     end
 
     novo_item = ItemCarrinho.find_or_initialize_by(
       usuario: usuario,
       produto: produto
     )
-    if novo_item.quantidade.nil?
+    if !novo_item.persisted?
+      criado = true
       novo_item.quantidade = params[:quantidade]
     else
       novo_item.quantidade += params[:quantidade].to_i
-      if novo_item.quantidade > produto&.estoque
-        novo_item.quantidade = produto&.estoque
+      if novo_item.quantidade > produto.estoque
+        novo_item.quantidade = produto.estoque
       end
     end
     if novo_item.save
-        status 201
-        redirect "/carrinho?id_usuario=#{usuario&.id}"
+      if criado
+        halt 201, {message: 'Item adicionado ao carrinho com sucesso'}.to_json
+      else
+        halt 200, {message: 'Item atualizado no carrinho com sucesso'}.to_json
+      end
     else
-      redirect "#{request.referer}&message="
+      halt 422, {message: 'Erro ao adicionar item ao carrinho', erros: novo_item.errors.full_messages}.to_json
     end
   end
 
@@ -234,7 +233,7 @@ class ECommerceApp < Sinatra::Base
       end
     end
     comprador&.produtos_carrinho&.destroy_all
-    redirect "/compras?id_usuario=#{params[:id_usuario]}"
+    halt 200, 'COMPRA FINALIZADA COM SUCESSO, PAGAMENTO PENDENTE'
   end
 
   #ROTA PARA PERFIL
