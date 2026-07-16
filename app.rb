@@ -314,7 +314,7 @@ class ECommerceApp < Sinatra::Base
       erb :error_screen
     end
     @id_usuario = params[:id_usuario]
-    @compras = Venda.where(comprador: params[:id_usuario]).includes(:vendedor).order(data: :desc)
+    @compras = Venda.where(comprador: params[:id_usuario]).includes(:vendedor).order(id: :desc)
     status 200
     erb :compras_usuario
   end
