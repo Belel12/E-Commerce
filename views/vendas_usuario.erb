@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="/css/compras_usuario.css">
+<script src="/scripts/alterar_status_venda.js" defer></script>
+<h2>Minhas Vendas</h2>
+<% if @vendas.any? %>
+  <div class="lista_compras">
+    <% @vendas.each do |venda| %>
+      <div class="compra">
+        <p class="id-compra">Venda: <%= venda.id %></p>
+        <p class="nome-vendedor">Comprador: <%= venda.comprador.nome %></p>
+        <p class="data-compra">Data: <%= venda.data %></p>
+        <p class="status-compra status-<%= venda.status %>"><strong>Status:</strong> <%= venda.status.capitalize %></p>
+        <p class="valor-total">Valor total: R$ <%= venda.valor_total %></p>
+        <a class="itens-compra" href="/itens_venda?id_usuario=<%= @id_usuario %>&id_venda=<%= venda.id %>">Visualizar itens</a>
+        <% if venda.status == 'paga' %><button class="enviar-compra-button" type="button" data-id-venda="<%= venda.id %>">Marcar como enviada</button><% end %>
+        <% if venda.status == 'enviada' %><button class="entregar-compra-button" type="button" data-id-venda="<%= venda.id %>">Marcar como entregue</button><% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <h3>Voce ainda nao tem vendas.</h3>
+<% end %>

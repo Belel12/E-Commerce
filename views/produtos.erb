@@ -1,0 +1,45 @@
+<link rel="stylesheet" href="/css/produtos.css">
+<h2>Meus Produtos</h2>
+
+<% if @produto.errors.any? %>
+  <div class="form-errors"><%= @produto.errors.full_messages.join(', ') %></div>
+<% end %>
+
+<form class="produto-form" action="/produtos" method="post">
+  <input type="hidden" name="id_usuario" value="<%= @id_usuario %>">
+  <fieldset>
+    <legend>Novo produto</legend>
+    <label for="nome">Nome</label>
+    <input id="nome" name="nome" required value="<%= @produto.nome %>">
+    <label for="descricao">Descricao</label>
+    <textarea id="descricao" name="descricao"><%= @produto.descricao %></textarea>
+    <label for="preco">Preco (R$)</label>
+    <input id="preco" name="preco" type="number" min="0" step="0.01" required value="<%= @produto.preco %>">
+    <label for="estoque">Estoque</label>
+    <input id="estoque" name="estoque" type="number" min="0" step="1" required value="<%= @produto.estoque %>">
+    <button type="submit">Publicar produto</button>
+  </fieldset>
+</form>
+
+<section class="lista-produtos">
+  <% if @produtos.any? %>
+    <% @produtos.each do |produto| %>
+      <article class="produto-gerenciado">
+        <form action="/produtos/<%= produto.id %>" method="post">
+          <input type="hidden" name="id_usuario" value="<%= @id_usuario %>">
+          <label>Nome<input name="nome" required value="<%= produto.nome %>"></label>
+          <label>Descricao<textarea name="descricao"><%= produto.descricao %></textarea></label>
+          <label>Preco (R$)<input name="preco" type="number" min="0" step="0.01" required value="<%= produto.preco %>"></label>
+          <label>Estoque<input name="estoque" type="number" min="0" step="1" required value="<%= produto.estoque %>"></label>
+          <button type="submit">Salvar alteracoes</button>
+        </form>
+        <form action="/produtos/<%= produto.id %>/excluir" method="post">
+          <input type="hidden" name="id_usuario" value="<%= @id_usuario %>">
+          <button class="excluir-produto" type="submit">Excluir</button>
+        </form>
+      </article>
+    <% end %>
+  <% else %>
+    <p class="sem-registros">Voce ainda nao publicou produtos.</p>
+  <% end %>
+</section>
