@@ -1,6 +1,4 @@
-/*
-TODO: colocar opção para selecionar a quantidade que deseja remover ao inves de tudo de uma vez
- */
+
 
 const id_usuario = new URLSearchParams(location.search).get('id_usuario')
 
