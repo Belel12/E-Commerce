@@ -429,19 +429,15 @@ class ECommerceApp < Sinatra::Base
 
     if produto.save
       redirect back
+    else
+      @previous_url = request.referer
+      status 422
+      erb :error_screen
     end
-
-    status 422
-    @id_usuario = usuario.id
-    @usuario = usuario
-    @produtos = usuario.produtos.order(:nome)
-    @produto = produto
-    erb :produtos
   end
 
   #ROTA PARA ACESSAR A TELA DE UM PRODUTO ESPECIFICO
   post '/produtos/:id' do
-    #TODO: adicionar verificação se mudou algo com js
     unless params[:nome].present? && params[:preco].present? && params[:estoque].present?
       halt 400, 'PARÂMETROS FALTANDO'
     end
@@ -471,13 +467,17 @@ class ECommerceApp < Sinatra::Base
     halt 404, 'PRODUTO NAO ENCONTRADO' unless produto
 
     produto.destroy!
-    redirect "/produtos?id_usuario=#{usuario.id}"
+    redirect back
   end
 
   #ROTA PARA EXIBIR AS VENDAS DO USUÁRIO
   get '/vendas' do
     usuario = Usuario.find_by(id: params[:id_usuario])
-    halt 404, 'USUARIO NAO ENCONTRADO' unless usuario
+    unless usuario
+      status 404
+      @previous_url = request.referer
+      erb :error_screen
+    end
 
     @id_usuario = usuario.id
     @vendas = usuario.vendas.includes(:comprador).order(data: :desc)
