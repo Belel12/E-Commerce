@@ -4,7 +4,7 @@ class CreateItemCarrinho < ActiveRecord::Migration[7.1]
       carrinho.references :usuario, null:false, foreign_key: { to_table: :usuarios }
       carrinho.references :produto, null:false, foreign_key: { to_table: :produtos }
       carrinho.integer :quantidade, null:false
-      carrinho.index [:usuario, :produto], unique:true
+      carrinho.index [:usuario_id, :produto_id], unique: true
     end
   end
 end
