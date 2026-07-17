@@ -12,5 +12,7 @@ db/schema.rb
 db/ecommerce.sqlite3
 db/ecommerce_dev.sqlite3
 db/ecommerce_test.sqlite3
+
+#Arquivos temporários do rspec
 spec/temp/
 
