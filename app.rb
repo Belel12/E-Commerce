@@ -51,7 +51,8 @@ class ECommerceApp < Sinatra::Base
       nome: params[:nome].strip,
       email: params[:email].strip,
       senha_hash: params[:senha].strip,
-      cpf: params[:cpf].strip
+      cpf: params[:cpf].strip,
+      telefone: params[:telefone]
     )
 
     if novo_usuario.save
