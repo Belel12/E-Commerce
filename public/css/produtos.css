@@ -1,0 +1,10 @@
+.produto-form { max-width: 760px; margin: 0 auto 36px; }
+.produto-form fieldset, .produto-gerenciado form { display: grid; gap: 10px; }
+.produto-form button { justify-self: start; margin-top: 8px; }
+.lista-produtos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.produto-gerenciado { background: var(--surface); border-radius: var(--radius-small); box-shadow: var(--shadow); padding: 20px; display: grid; gap: 16px; }
+.produto-gerenciado textarea { min-height: 80px; }
+.excluir-produto { background: var(--danger); }
+.form-errors { max-width: 760px; margin: 0 auto 20px; color: var(--danger); font-weight: 600; }
+.sem-registros { text-align: center; color: var(--text-light); }
+@media (max-width: 550px) { .produto-form button { justify-self: stretch; } }
