@@ -17,9 +17,6 @@ class ECommerceApp < Sinatra::Base
   set :database, "db/ecommerce_#{ENV['RACK_ENV'] || 'development'}.sqlite3"
   set :adapter, :sqlite3
 
-  #TODO: adicionar botão de voltar nas telas de erro erb :error_screen com request.referer
-  #TODO: verificar erbs e halts
-
   #ROTA DA PAGINA INICIAL
   get '/' do
     status 200
@@ -96,13 +93,13 @@ class ECommerceApp < Sinatra::Base
       halt 404, 'PRODUTO NAO ENCONTRADO'
     end
     @id_usuario = params[:id_usuario].empty?? nil : params[:id_usuario]
-    erb :'produto_inspect'
+    erb :produto_inspect
   end
 
   #ROTA DE ADICIONAR AO CARRINHO
   post '/adicionar_carrinho' do
     content_type :json
-    unless params[:id_produto].present? && params[:id_produto].present? && params[:quantidade].present?
+    unless params[:id_usuario].present? && params[:id_produto].present? && params[:quantidade].present?
       halt 400, {message: 'Parâmetros faltando'}.to_json
     end
     produto = Produto.find_by(id: params[:id_produto])
@@ -114,7 +111,6 @@ class ECommerceApp < Sinatra::Base
     if usuario.nil?
       halt 404, {message: 'Usuário não encontrado'}.to_json
     end
-
     novo_item = ItemCarrinho.find_or_initialize_by(
       usuario: usuario,
       produto: produto
@@ -123,10 +119,8 @@ class ECommerceApp < Sinatra::Base
       criado = true
       novo_item.quantidade = params[:quantidade]
     else
-      novo_item.quantidade += params[:quantidade].to_i
-      if novo_item.quantidade > produto.estoque
-        novo_item.quantidade = produto.estoque
-      end
+      criado = false
+      novo_item.quantidade = [novo_item.quantidade+params[:quantidade].to_i,produto.estoque].min
     end
     if novo_item.save
       if criado
@@ -259,9 +253,7 @@ class ECommerceApp < Sinatra::Base
   post '/perfil' do
     content_type :json
     unless params[:tipo_alteracao].present?
-      status 400
-      @message = 'PARAMETRO DO TIPO DE ALTERAÇÃO FALTANDO'
-      erb :error_screen
+      halt 400, {message: 'Tipo de alteração não definida'}.to_json
     end
     usuario = Usuario.find_by(id: params[:id_usuario])
     if usuario.nil?
@@ -298,6 +290,7 @@ class ECommerceApp < Sinatra::Base
   get '/compras' do
     unless params[:id_usuario].present?
       @message='ERRO AO PROCURAR COMRPAS, USUÁRIO FALTANDO'
+      @previous_url = request.referer
       status 400
       erb :error_screen
     end
@@ -309,6 +302,7 @@ class ECommerceApp < Sinatra::Base
 
   #ROTA PARA VISUALIZAR OS ITENS DE UMA VENDA
   get '/itens_venda' do
+    @previous_url = request.referer
     unless params[:id_venda].present?
       @message = 'ID DA VENDA FALTANDO'
       status 400
