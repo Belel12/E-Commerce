@@ -56,22 +56,22 @@ const comprar = async (id_produto,id_usuario,quantidade) => {
 }
 
 const botaoAdicionarCarrinho = document.getElementById('adicionar-carrinho')
-botaoAdicionarCarrinho.addEventListener('click',async () => {
+botaoAdicionarCarrinho?.addEventListener('click',async () => {
     if (!confirm('Deseja adicionar este item ao carrinho?')){return}
-    const quantidade = quantidadeInput.value
-    if(quantidade <= 0 || quantidade > quantidadeInput.getAttribute('max')){
+    const quantidade = Number(quantidadeInput.value)
+    if(quantidade <= 0 || quantidade > Number(quantidadeInput.getAttribute('max'))){
         alert('Erro\nQuantidade inválida')
         return
     }
-    const id_produto = botaoAdicionarCarrinho.getAttribute('data-id-produto')
+    const id_produto = Number(botaoAdicionarCarrinho.getAttribute('data-id-produto'))
     adicionarCarrinho(id_produto,id_usuario,quantidade)
 })
 
 const botaoComprar = document.getElementById('comprar')
-botaoComprar.addEventListener('click',async () => {
+botaoComprar?.addEventListener('click',async () => {
     if (!confirm('Deseja finalizar a compra deste produto?')){return}
-    const quantidade = quantidadeInput.value
-    if(quantidade <= 0 || quantidade > quantidadeInput.getAttribute('max')){
+    const quantidade = Number(quantidadeInput.value)
+    if(quantidade <= 0 || quantidade > Number(quantidadeInput.getAttribute('max'))){
         alert('Erro\nQuantidade inválida')
         return
     }
