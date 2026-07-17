@@ -58,7 +58,7 @@ async function alterarStatusVenda(id_venda,status){
             }
         }
         else if (json['error_type'] === 'produto_apagado'){
-            alert('Parece que produtos da sua compra foram apagados pelo vendedor :(')
+            alert('Parece que produtos da sua compra foram apagados pelo vendedor :(\nEles serão removidos da sua compra e, caso não reste nenhum produto, a compra será apagada')
             window.location.reload()
         }
         else{
