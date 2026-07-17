@@ -406,6 +406,89 @@ class ECommerceApp < Sinatra::Base
     end
     halt 204, {message: 'Itens apagados'}.to_json
   end
+
+  #ROTA PARA ACESSAR OS PRODUTOS DO USUÁRIO
+  get '/produtos' do
+    @usuario = Usuario.find_by(id: params[:id_usuario])
+    halt 404, 'USUARIO NAO ENCONTRADO' unless @usuario
+
+    @id_usuario = @usuario.id
+    @produtos = @usuario.produtos.order(:nome)
+    @produto = Produto.new
+    erb :produtos
+  end
+
+  #ROTA PARA CADASTRAR PRODUTO
+  post '/produtos' do
+    unless params[:nome].present? && params[:preco].present? && params[:estoque].present?
+      halt 400, 'PARÂMETROS FALTANDO'
+    end
+    usuario = Usuario.find_by(id: params[:id_usuario])
+    halt 404, 'USUARIO NAO ENCONTRADO' unless usuario
+
+    produto = usuario.produtos.new(
+      nome: params[:nome],
+      descricao: params[:descricao],
+      preco: params[:preco],
+      estoque: params[:estoque]
+    )
+
+    if produto.save
+      redirect back
+    end
+
+    status 422
+    @id_usuario = usuario.id
+    @usuario = usuario
+    @produtos = usuario.produtos.order(:nome)
+    @produto = produto
+    erb :produtos
+  end
+
+  #ROTA PARA ACESSAR A TELA DE UM PRODUTO ESPECIFICO
+  post '/produtos/:id' do
+    #TODO: adicionar verificação se mudou algo com js
+    unless params[:nome].present? && params[:preco].present? && params[:estoque].present?
+      halt 400, 'PARÂMETROS FALTANDO'
+    end
+
+    usuario = Usuario.find_by(id: params[:id_usuario])
+    halt 404, 'USUARIO NAO ENCONTRADO' unless usuario
+
+    produto = usuario.produtos.find_by(id: params[:id])
+    halt 404, 'PRODUTO NAO ENCONTRADO' unless produto
+
+
+    halt 422, produto.errors.full_messages.join(', ') unless produto.update(
+      nome: params[:nome],
+      descricao: params[:descricao],
+      preco: params[:preco],
+      estoque: params[:estoque]
+    )
+    redirect back
+  end
+
+  #ROTA PARA EXCLUIR UM PRODUTO
+  post '/produtos/:id/excluir' do
+    usuario = Usuario.find_by(id: params[:id_usuario])
+    halt 404, 'USUARIO NAO ENCONTRADO' unless usuario
+
+    produto = usuario.produtos.find_by(id: params[:id])
+    halt 404, 'PRODUTO NAO ENCONTRADO' unless produto
+
+    produto.destroy!
+    redirect "/produtos?id_usuario=#{usuario.id}"
+  end
+
+  #ROTA PARA EXIBIR AS VENDAS DO USUÁRIO
+  get '/vendas' do
+    usuario = Usuario.find_by(id: params[:id_usuario])
+    halt 404, 'USUARIO NAO ENCONTRADO' unless usuario
+
+    @id_usuario = usuario.id
+    @vendas = usuario.vendas.includes(:comprador).order(data: :desc)
+    erb :vendas_usuario
+  end
 end
 
 
