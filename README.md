@@ -8,6 +8,7 @@
   * você pode instalar rodando o comando `gem install bundler` no terminal
 
 ### Comandos Úteis
+* **Instalar dependências do projeto**: `bundle install`
 * **Construir o banco de dados**: `bundle exec rake build`
 * **Apagar o banco existente**: `bundle exec rake db:drop`
 * **Popular o banco de desenvolvimento com tuplas artificiais**: `bundle exec rake db:seed`
