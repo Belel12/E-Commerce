@@ -5,6 +5,6 @@ const botoes = document.getElementsByClassName('go-back-button')
 
 for(let botao of botoes){
     botao.addEventListener('click',() => {
-        window.location.href = botao.getAttribute('id');
+        window.location = botao.getAttribute('id');
     })
 }
