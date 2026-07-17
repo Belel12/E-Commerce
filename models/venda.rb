@@ -26,9 +26,8 @@ class Venda < ActiveRecord::Base
   before_save :atualizar_estoque
 
   def validar_venda
-    itens = self.itens_venda.includes(:produto)
-    verificar_produtos_apagados(itens)
-    verificar_inconsistencia_estoque(itens)
+    verificar_produtos_apagados
+    verificar_inconsistencia_estoque
   end
   private
   def atualizar_estoque
@@ -46,23 +45,17 @@ class Venda < ActiveRecord::Base
 
   end
 
-  def verificar_produtos_apagados(itens_venda)
-    produtos_apagados = Array.new
-    itens_venda.each do |item|
-      if item.produto.nil? then produtos_apagados << item end
-    end
+  def verificar_produtos_apagados
+    produtos_apagados = self.itens_venda.where(produto: nil)
     if produtos_apagados.count > 0
       raise ProdutoApagadoError.new 'Produtos foram apagados',produtos_apagados
     end
   end
 
-  def verificar_inconsistencia_estoque(itens_venda)
-    itens_inconsistentes = Array.new
-    itens_venda.each do |item|
-      if item.produto.estoque < item.quantidade
-        itens_inconsistentes << item
-      end
-    end
+  def verificar_inconsistencia_estoque
+    itens_inconsistentes = itens_venda.joins(:produto)
+                                      .where.not(produto: nil)
+                                      .where('itens_venda.quantidade > produtos.estoque')
     if itens_inconsistentes.count > 0
       raise SemEstoqueError.new 'sem produtos suficientes no estoque',itens_inconsistentes
     end
