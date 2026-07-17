@@ -18,7 +18,7 @@ usuarios = [
 puts "#{usuarios.count} usuários criados."
 
 puts 'Criando produtos...'
-
+srand(42)
 nomes_produtos = [
   'Caneta Esferográfica', 'Caderno Universitário', 'Mochila Escolar',
   'Fone de Ouvido Bluetooth', 'Teclado Mecânico', 'Mouse sem Fio',
@@ -56,7 +56,7 @@ status_possiveis = %i[pendente paga enviada entregue cancelada]
   total = 0
 
   itens.each do |produto|
-    quantidade = rand(1..5)
+    quantidade = rand(1..[produto.estoque, 5].min)
     preco_unitario = produto.preco
 
     ItemVenda.create!(
