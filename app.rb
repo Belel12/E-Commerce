@@ -277,7 +277,7 @@ class ECommerceApp < Sinatra::Base
         halt 422, {message: 'Erro ao salvar usuário',erros: usuario.errors.full_messages}.to_json
       end
     elsif params[:tipo_alteracao] == 'alterar_senha'
-      if Digest::MD5.hexdigest(params[:senha_atual].to_s) != usuario.senha_hash
+      if Digest::MD5.hexdigest(params[:senha_atual]) != usuario.senha_hash
         halt 422,{message: 'Senha atual incorreta'}.to_json
       elsif params[:nova_senha] != params[:confirmar_nova_senha]
         halt 422, {message: 'Senhas são diferentes'}.to_json
