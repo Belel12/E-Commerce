@@ -22,7 +22,8 @@ class Usuario < ActiveRecord::Base
 
   private
   def hash_password!
-    self.senha_hash = Digest::MD5.hexdigest self.senha_hash.to_s
+    return unless senha_hash_changed?
+    self.senha_hash = Digest::MD5.hexdigest(self.senha_hash)
   end
 end
 
