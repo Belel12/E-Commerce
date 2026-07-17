@@ -389,8 +389,8 @@ class ECommerceApp < Sinatra::Base
     unless params[:id_itens].present?
       halt 400, {message: 'id_vendas faltando'}.to_json
     end
-    itens = ItemVenda.select(:id).where(id: params[:id_itens])
-    if itens.nil?
+    itens = ItemVenda.where(id: params[:id_itens])
+    if itens.empty?
       halt 400, {message: 'nenhum item encontrado para os ids passados'}.to_json
     end
     venda_associada = itens.first.venda
