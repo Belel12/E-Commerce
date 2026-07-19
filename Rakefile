@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 require_relative 'app'
 require 'sinatra/activerecord/rake'
-
 
 task :ola do
   puts('Ola Mundo')
@@ -16,7 +17,7 @@ task :build do
   if ENV['RACK_ENV'] == 'development'
     Rake::Task['db:create'].invoke
     Rake::Task['db:migrate'].invoke
-    Rake::Task['db:migrate_test'].invoke #migração do banco de teste
+    Rake::Task['db:migrate_test'].invoke # migração do banco de teste
   elsif ENV['RACK_ENV'] == 'production'
     Rake::Task['db:create'].invoke
     Rake::Task['db:migrate'].invoke
@@ -24,4 +25,3 @@ task :build do
     puts "\n\nAMBIENTE DE CONSTRUÇÃO #{ENV['RACK_ENV']} NÃO RECONHECIDO"
   end
 end
-

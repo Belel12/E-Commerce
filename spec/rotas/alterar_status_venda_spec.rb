@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'support'
 require 'json'
 
@@ -5,7 +7,9 @@ describe 'PUT /alterar_status_venda', type: :route do
   let!(:comprador) { usuario_valido('18') }
   let!(:vendedor) { usuario_valido('19') }
   let!(:outro_usuario) { usuario_valido('20') }
-  let!(:venda) { Venda.create!(comprador: comprador, vendedor: vendedor, data: Date.today, status: 'pendente', valor_total: 0) }
+  let!(:venda) do
+    Venda.create!(comprador: comprador, vendedor: vendedor, data: Date.today, status: 'pendente', valor_total: 0)
+  end
 
   def alterar_status(dados)
     put '/alterar_status_venda', dados.to_json, 'CONTENT_TYPE' => 'application/json'

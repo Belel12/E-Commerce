@@ -1,8 +1,12 @@
+# frozen_string_literal: true
+
 require_relative 'support'
 
 describe 'POST /perfil', type: :route do
   let!(:usuario) { usuario_valido('13') }
-  let(:dados_conta) { { id_usuario: usuario.id, tipo_alteracao: 'dados_conta', nome: 'Novo nome', cpf: usuario.cpf, telefone: '123' } }
+  let(:dados_conta) do
+    { id_usuario: usuario.id, tipo_alteracao: 'dados_conta', nome: 'Novo nome', cpf: usuario.cpf, telefone: '123' }
+  end
 
   context 'quando o tipo de alteração não foi informado' do
     it 'responde 400' do
@@ -34,21 +38,24 @@ describe 'POST /perfil', type: :route do
 
   context 'quando a alteração de senha é válida' do
     it 'responde 200' do
-      post '/perfil', id_usuario: usuario.id, tipo_alteracao: 'alterar_senha', senha_atual: 'senha-segura', nova_senha: 'nova-senha', confirmar_nova_senha: 'nova-senha'
+      post '/perfil', id_usuario: usuario.id, tipo_alteracao: 'alterar_senha', senha_atual: 'senha-segura',
+                      nova_senha: 'nova-senha', confirmar_nova_senha: 'nova-senha'
       expect(last_response.status).to eq(200)
     end
   end
 
   context 'quando a senha atual é inválida' do
     it 'responde 422' do
-      post '/perfil', id_usuario: usuario.id, tipo_alteracao: 'alterar_senha', senha_atual: 'errada', nova_senha: 'nova-senha', confirmar_nova_senha: 'nova-senha'
+      post '/perfil', id_usuario: usuario.id, tipo_alteracao: 'alterar_senha', senha_atual: 'errada',
+                      nova_senha: 'nova-senha', confirmar_nova_senha: 'nova-senha'
       expect(last_response.status).to eq(422)
     end
   end
 
   context 'quando as novas senhas são diferentes' do
     it 'responde 422' do
-      post '/perfil', id_usuario: usuario.id, tipo_alteracao: 'alterar_senha', senha_atual: 'senha-segura', nova_senha: 'nova-senha', confirmar_nova_senha: 'outra-senha'
+      post '/perfil', id_usuario: usuario.id, tipo_alteracao: 'alterar_senha', senha_atual: 'senha-segura',
+                      nova_senha: 'nova-senha', confirmar_nova_senha: 'outra-senha'
       expect(last_response.status).to eq(422)
     end
   end

@@ -1,10 +1,14 @@
+# frozen_string_literal: true
+
 require_relative 'support'
 
 describe 'DELETE /itens_venda', type: :route do
   let!(:comprador) { usuario_valido('21') }
   let!(:vendedor) { usuario_valido('22') }
   let!(:produto) { produto_valido(vendedor) }
-  let!(:venda) { Venda.create!(comprador: comprador, vendedor: vendedor, data: Date.today, status: 'pendente', valor_total: 0) }
+  let!(:venda) do
+    Venda.create!(comprador: comprador, vendedor: vendedor, data: Date.today, status: 'pendente', valor_total: 0)
+  end
   let!(:item) { ItemVenda.create!(venda: venda, produto: produto, quantidade: 1, preco_unitario: produto.preco) }
 
   context 'quando os ids dos itens não são informados' do

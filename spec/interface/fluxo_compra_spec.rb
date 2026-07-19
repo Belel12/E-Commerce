@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 
 describe 'Fluxo de compra pela interface', type: :route do

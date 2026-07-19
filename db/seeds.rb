@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # db/seeds.rb
 puts 'Limpando dados antigos (ordem por causa das FKs)...'
 ItemVenda.delete_all
@@ -8,11 +10,16 @@ Usuario.delete_all
 puts 'Criando usuários...'
 
 usuarios = [
-  { nome: 'Ana Silva',    email: 'ana.silva@teste.com',    cpf: '11111111111', senha_hash: 'senha1234', telefone: '62999990001' },
-  { nome: 'Bruno Costa',  email: 'bruno.costa@teste.com',  cpf: '22222222222', senha_hash: 'senha1234', telefone: '62999990002' },
-  { nome: 'Carla Souza',  email: 'carla.souza@teste.com',  cpf: '33333333333', senha_hash: 'senha1234', telefone: '62999990003' },
-  { nome: 'Diego Lima',   email: 'diego.lima@teste.com',   cpf: '44444444444', senha_hash: 'senha1234', telefone: '62999990004' },
-  { nome: 'Elisa Rocha',  email: 'elisa.rocha@teste.com',  cpf: '55555555555', senha_hash: 'senha1234', telefone: '62999990005' }
+  { nome: 'Ana Silva',    email: 'ana.silva@teste.com',    cpf: '11111111111', senha_hash: 'senha1234',
+    telefone: '62999990001' },
+  { nome: 'Bruno Costa',  email: 'bruno.costa@teste.com',  cpf: '22222222222', senha_hash: 'senha1234',
+    telefone: '62999990002' },
+  { nome: 'Carla Souza',  email: 'carla.souza@teste.com',  cpf: '33333333333', senha_hash: 'senha1234',
+    telefone: '62999990003' },
+  { nome: 'Diego Lima',   email: 'diego.lima@teste.com',   cpf: '44444444444', senha_hash: 'senha1234',
+    telefone: '62999990004' },
+  { nome: 'Elisa Rocha',  email: 'elisa.rocha@teste.com',  cpf: '55555555555', senha_hash: 'senha1234',
+    telefone: '62999990005' }
 ].map { |attrs| Usuario.create!(attrs) }
 
 puts "#{usuarios.count} usuários criados."

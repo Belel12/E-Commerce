@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RotasSupport
   def app
     ECommerceApp

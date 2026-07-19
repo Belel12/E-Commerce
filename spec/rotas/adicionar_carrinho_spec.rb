@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'support'
 
 describe 'POST /adicionar_carrinho', type: :route do

@@ -1,49 +1,48 @@
+# frozen_string_literal: true
+
 require 'sinatra'
 require 'sinatra/activerecord'
 
-#importa todos os models existentes
-Dir['./models/*.rb'].each { |file| require_relative file}
+# importa todos os models existentes
+Dir['./models/*.rb'].sort.each { |file| require_relative file }
 
-#define o ambiente/banco a ser usado
+# define o ambiente/banco a ser usado
 ENV['RACK_ENV'] ||= 'development'
 class ECommerceApp < Sinatra::Base
+  # define o caminho para procurar as migrations
+  ActiveRecord::Migrator.migrations_paths = ['db/migrate']
 
-  #define o caminho para procurar as migrations
-  ActiveRecord::Migrator.migrations_paths = ["db/migrate"]
-
-  #define conexao com o banco dependendo do ambiente
+  # define conexao com o banco dependendo do ambiente
   # nao ta funcionando, o que define por enquanto ta
   # sendo o database.yml
   set :database, "db/ecommerce_#{ENV['RACK_ENV'] || 'development'}.sqlite3"
   set :adapter, :sqlite3
 
-  #ROTA DA PAGINA INICIAL
+  # ROTA DA PAGINA INICIAL
   get '/' do
     status 200
     @id_usuario = params[:id_usuario]
-    #PEGA TODOS OS PRODUTOS QUE N PERTENCAM AQUELE USUARIO
+    # PEGA TODOS OS PRODUTOS QUE N PERTENCAM AQUELE USUARIO
     # CASO O USUARIO N TIVER LOGADO, APARECERA TUDO
     @produtos = Produto.where.not(usuario: params[:id_usuario])
-                .where(estoque: 1..)
+                       .where(estoque: 1..)
     if params[:busca].present?
       busca = ActiveRecord::Base.sanitize_sql_like(params[:busca])
-      @produtos = @produtos.where("nome LIKE ?","%#{busca}%")
+      @produtos = @produtos.where('nome LIKE ?', "%#{busca}%")
     end
     erb :tela_inicial
   end
 
-  #ROTA PARA TELA DE CADASTRO
+  # ROTA PARA TELA DE CADASTRO
   get '/cadastro' do
     status 200
     erb :cadastro
   end
 
-  #ROTA PARA PROCESSAR REQUISIÇÃO DE CADASTRO
+  # ROTA PARA PROCESSAR REQUISIÇÃO DE CADASTRO
   post '/cadastro' do
     content_type :json
-    if params[:senha] != params[:confirmar_senha]
-      halt 422, {message: 'Senhas são diferentes'}.to_json
-    end
+    halt 422, { message: 'Senhas são diferentes' }.to_json if params[:senha] != params[:confirmar_senha]
     novo_usuario = Usuario.new(
       nome: params[:nome].strip,
       email: params[:email].strip,
@@ -53,12 +52,12 @@ class ECommerceApp < Sinatra::Base
     )
 
     if novo_usuario.save
-      #redirect '/login?cadastro_redirect=true'
-      halt 201,{message: 'Usuário cadastrado com sucesso'}.to_json
+      # redirect '/login?cadastro_redirect=true'
+      halt 201, { message: 'Usuário cadastrado com sucesso' }.to_json
     else
-      halt 422,{
+      halt 422, {
         message: 'Usuário inválido',
-        erros: novo_usuario.errors.full_messages,
+        erros: novo_usuario.errors.full_messages
       }.to_json
     end
   end
@@ -69,48 +68,42 @@ class ECommerceApp < Sinatra::Base
     erb :login
   end
 
-  #ROTA PARA PROCESSAMENTO DA REQUISIÇÃO
+  # ROTA PARA PROCESSAMENTO DA REQUISIÇÃO
   # DO LOGIN
   post '/login' do
     content_type :json
     user = Usuario.find_by(email: params[:email].strip)
     if user
       if user.senha_hash == Digest::MD5.hexdigest(params[:senha].strip)
-        halt 200, {user_id: user.id}.to_json
+        halt 200, { user_id: user.id }.to_json
       else
-        halt 422, {message: 'Senha inválida'}.to_json
+        halt 422, { message: 'Senha inválida' }.to_json
       end
     else
-      halt 404, {message: 'Email não cadastrado'}.to_json
+      halt 404, { message: 'Email não cadastrado' }.to_json
     end
   end
 
-  #ROTAS DE PRODUTO
+  # ROTAS DE PRODUTO
   # ROTA PARA ACESSAR A PAGINA DE UM PRODUTO ESPECIFICO
   get '/produto' do
     @produto = Produto.find_by(id: params[:id_produto])
-    if @produto.nil?
-      halt 404, 'PRODUTO NAO ENCONTRADO'
-    end
-    @id_usuario = params[:id_usuario].empty?? nil : params[:id_usuario]
+    halt 404, 'PRODUTO NAO ENCONTRADO' if @produto.nil?
+    @id_usuario = params[:id_usuario].empty? ? nil : params[:id_usuario]
     erb :produto_inspect
   end
 
-  #ROTA DE ADICIONAR AO CARRINHO
+  # ROTA DE ADICIONAR AO CARRINHO
   post '/adicionar_carrinho' do
     content_type :json
     unless params[:id_usuario].present? && params[:id_produto].present? && params[:quantidade].present?
-      halt 400, {message: 'Parâmetros faltando'}.to_json
+      halt 400, { message: 'Parâmetros faltando' }.to_json
     end
     produto = Produto.find_by(id: params[:id_produto])
-    if produto.nil?
-      halt 404, {message: 'Produto não encontrado'}.to_json
-    end
+    halt 404, { message: 'Produto não encontrado' }.to_json if produto.nil?
 
     usuario = Usuario.find_by(id: params[:id_usuario])
-    if usuario.nil?
-      halt 404, {message: 'Usuário não encontrado'}.to_json
-    end
+    halt 404, { message: 'Usuário não encontrado' }.to_json if usuario.nil?
     novo_item = ItemCarrinho.find_or_initialize_by(
       usuario: usuario,
       produto: produto
@@ -120,84 +113,66 @@ class ECommerceApp < Sinatra::Base
       novo_item.quantidade = params[:quantidade]
     else
       criado = false
-      novo_item.quantidade = [novo_item.quantidade+params[:quantidade].to_i,produto.estoque].min
+      novo_item.quantidade = [novo_item.quantidade + params[:quantidade].to_i, produto.estoque].min
     end
     if novo_item.save
       if criado
-        halt 201, {message: 'Item adicionado ao carrinho com sucesso'}.to_json
+        halt 201, { message: 'Item adicionado ao carrinho com sucesso' }.to_json
       else
-        halt 200, {message: 'Item atualizado no carrinho com sucesso'}.to_json
+        halt 200, { message: 'Item atualizado no carrinho com sucesso' }.to_json
       end
     else
-      halt 422, {message: 'Erro ao adicionar item ao carrinho', erros: novo_item.errors.full_messages}.to_json
+      halt 422, { message: 'Erro ao adicionar item ao carrinho', erros: novo_item.errors.full_messages }.to_json
     end
   end
 
-  #ROTA DO CARRINHO
+  # ROTA DO CARRINHO
   get '/carrinho' do
     usuario = Usuario.find_by(id: params[:id_usuario])
-    if usuario.nil?
-      halt 404, 'USUARIO NAO ENCONTRADO'
-    end
+    halt 404, 'USUARIO NAO ENCONTRADO' if usuario.nil?
     status 200
     @id_usuario = usuario&.id
     @itens_carrinho_usuario = usuario&.produtos_carrinho&.includes(:produto)
     erb :carrinho
   end
 
-  #ROTA PARA REMOVER ITEM DO CARRINHO
+  # ROTA PARA REMOVER ITEM DO CARRINHO
   delete '/remover_item_carrinho' do
     content_type :json
     item = ItemCarrinho.find_by(id: params[:id_item])
-    if item.nil?
-      halt 404, {message: 'Item não encontrado'}.to_json
-    end
+    halt 404, { message: 'Item não encontrado' }.to_json if item.nil?
     if item.destroy.destroyed?
-      halt 204, {message: 'Item deletado com sucesso'}.to_json
+      halt 204, { message: 'Item deletado com sucesso' }.to_json
     else
-      halt 422, {message: 'Erro ao apagar item',erros: item.errors.full_messages}.to_json
+      halt 422, { message: 'Erro ao apagar item', erros: item.errors.full_messages }.to_json
     end
   end
 
-  #ROTA PARA REALIZAR COMPRA -> CRIAR VENDA
+  # ROTA PARA REALIZAR COMPRA -> CRIAR VENDA
   post '/comprar' do
     comprador = Usuario.find_by(id: params[:id_usuario])
-    if comprador.nil?
-      halt 404, 'COMPRADOR NAO ENCONTRADO'
-    end
+    halt 404, 'COMPRADOR NAO ENCONTRADO' if comprador.nil?
 
-    if params[:id_produto] and params[:ids_produto]
-      halt 400, 'PARÂMETROS ID EM EXCESSO'
-    end
+    halt 400, 'PARÂMETROS ID EM EXCESSO' if params[:id_produto] && params[:ids_produto]
 
-    if params[:quantidade] and params[:quantidade_produtos]
-      halt 400, 'PARÂMETROS QUANTIDADE EM EXCESSO'
-    end
+    halt 400, 'PARÂMETROS QUANTIDADE EM EXCESSO' if params[:quantidade] && params[:quantidade_produtos]
 
     quantidade_s = Array(params[:quantidade] || params[:quantidade_produtos])
 
     produto_s = Array(params[:id_produto] || params[:ids_produto])
-    if produto_s.nil? || produto_s.empty?
-      halt 400, 'ID(s) DE PRODUTO FALTANDO'
-    end
+    halt 400, 'ID(s) DE PRODUTO FALTANDO' if produto_s.nil? || produto_s.empty?
 
-    if quantidade_s.nil? || quantidade_s.empty?
-      halt 400, 'QUANTIDADE FALTANDO'
-    end
+    halt 400, 'QUANTIDADE FALTANDO' if quantidade_s.nil? || quantidade_s.empty?
 
-    if quantidade_s&.length != produto_s&.length
-      halt 400, 'QUANTIDADE DE IDS DIFERENTE DA DE QUANTIDADES'
-    end
+    halt 400, 'QUANTIDADE DE IDS DIFERENTE DA DE QUANTIDADES' if quantidade_s&.length != produto_s&.length
     produto_s = Produto
-                  .includes(:usuario)
-                  .where(id: produto_s)
-                  .group_by { |produto| produto.usuario}
-    if produto_s.nil?
-      halt 404, 'NENHUM PRODUTO ENCONTRADO PARA O(s) ID(s) PASSADOS'
-    end
+                .includes(:usuario)
+                .where(id: produto_s)
+                .group_by(&:usuario)
+    halt 404, 'NENHUM PRODUTO ENCONTRADO PARA O(s) ID(s) PASSADOS' if produto_s.nil?
     i = -1
     produto_s&.each do |vendedor, produtos|
-      i+=1
+      i += 1
       nova_venda = Venda.new(
         comprador: comprador,
         vendedor: vendedor,
@@ -205,11 +180,9 @@ class ECommerceApp < Sinatra::Base
         status: 'pendente',
         valor_total: 0
       )
-      unless nova_venda.save
-        halt 422, nova_venda.errors.full_messages.join(', ')
-      end
+      halt 422, nova_venda.errors.full_messages.join(', ') unless nova_venda.save
       produtos.each do |produto|
-        #se o item nao for salvo devido algum erro,
+        # se o item nao for salvo devido algum erro,
         # ele será simplesmente ignorado
         ItemVenda.create(
           venda: nova_venda,
@@ -223,60 +196,52 @@ class ECommerceApp < Sinatra::Base
     halt 200, 'COMPRA FINALIZADA COM SUCESSO, PAGAMENTO PENDENTE'
   end
 
-  #ROTA PARA PERFIL
+  # ROTA PARA PERFIL
   get '/perfil' do
-    if params[:message] and !params[:message].blank?
-      case params[:message]
-      when 'dados'
-        @message = 'Dados atualizados com sucesso!'
-      when 'senha'
-        @message = 'Senha alterada com sucesso!'
-      when 'erro_senha_atual'
-        @message = "ERRO\nSENHA ATUAL INCORRETA"
-      when 'erro_senhas_diferentes'
-        @message = "ERRO\nSENHAS DIFERENTES"
-      else
-        @message = nil
-      end
+    if params[:message] && !params[:message].blank?
+      @message = case params[:message]
+                 when 'dados'
+                   'Dados atualizados com sucesso!'
+                 when 'senha'
+                   'Senha alterada com sucesso!'
+                 when 'erro_senha_atual'
+                   "ERRO\nSENHA ATUAL INCORRETA"
+                 when 'erro_senhas_diferentes'
+                   "ERRO\nSENHAS DIFERENTES"
+                 end
     end
     @usuario = Usuario.find_by(id: params[:id_usuario])
-    if @usuario.nil?
-      halt 404, 'USUARIO NÃO ENCONTRADO'
-    end
-    @id_usuario = @usuario&.id #apenas para o layout mostrar a nav_bar correta
+    halt 404, 'USUARIO NÃO ENCONTRADO' if @usuario.nil?
+    @id_usuario = @usuario&.id # apenas para o layout mostrar a nav_bar correta
     status 200
     erb :perfil
   end
 
-  #ROTA PARA ACESSAR O PERFIL
+  # ROTA PARA ACESSAR O PERFIL
   # PODENDO VISUALIZAR E EDITAR DADOS E SENHA
   post '/perfil' do
     content_type :json
-    unless params[:tipo_alteracao].present?
-      halt 400, {message: 'Tipo de alteração não definida'}.to_json
-    end
+    halt 400, { message: 'Tipo de alteração não definida' }.to_json unless params[:tipo_alteracao].present?
     usuario = Usuario.find_by(id: params[:id_usuario])
-    if usuario.nil?
-      halt 404,{message: 'USUÁRIO NÃO ENCONTRADO'}.to_json
-    end
+    halt 404, { message: 'USUÁRIO NÃO ENCONTRADO' }.to_json if usuario.nil?
     if params[:tipo_alteracao] == 'dados_conta'
       usuario.nome = params[:nome]
       usuario.cpf = params[:cpf]
       usuario.telefone = params[:telefone]
       if usuario.save
-        halt 200, {message: 'Usuário alterado com sucesso'}.to_json
+        halt 200, { message: 'Usuário alterado com sucesso' }.to_json
       else
-        halt 422, {message: 'Erro ao salvar usuário',erros: usuario.errors.full_messages}.to_json
+        halt 422, { message: 'Erro ao salvar usuário', erros: usuario.errors.full_messages }.to_json
       end
     elsif params[:tipo_alteracao] == 'alterar_senha'
       if Digest::MD5.hexdigest(params[:senha_atual]) != usuario.senha_hash
-        halt 422,{message: 'Senha atual incorreta'}.to_json
+        halt 422, { message: 'Senha atual incorreta' }.to_json
       elsif params[:nova_senha] != params[:confirmar_nova_senha]
-        halt 422, {message: 'Senhas são diferentes'}.to_json
+        halt 422, { message: 'Senhas são diferentes' }.to_json
       end
       usuario.senha_hash = params[:nova_senha]
       if usuario.save
-        halt 200,{message: 'Senha alterada com sucesso'}.to_json
+        halt 200, { message: 'Senha alterada com sucesso' }.to_json
       else
         halt 422, {
           message: 'Erro ao salvar nova senha',
@@ -286,10 +251,10 @@ class ECommerceApp < Sinatra::Base
     end
   end
 
-  #ROTA PARA VISUALIZAR COMPRAS DO USUARIO
+  # ROTA PARA VISUALIZAR COMPRAS DO USUARIO
   get '/compras' do
     unless params[:id_usuario].present?
-      @message='ERRO AO PROCURAR COMRPAS, USUÁRIO FALTANDO'
+      @message = 'ERRO AO PROCURAR COMRPAS, USUÁRIO FALTANDO'
       @previous_url = request.referer
       status 400
       erb :error_screen
@@ -300,7 +265,7 @@ class ECommerceApp < Sinatra::Base
     erb :compras_usuario
   end
 
-  #ROTA PARA VISUALIZAR OS ITENS DE UMA VENDA
+  # ROTA PARA VISUALIZAR OS ITENS DE UMA VENDA
   get '/itens_venda' do
     @previous_url = request.referer
     unless params[:id_venda].present?
@@ -325,18 +290,21 @@ class ECommerceApp < Sinatra::Base
     erb :itens_venda
   end
 
-  #ROTA DE API PARA VALIDAR A SENHA
+  # ROTA DE API PARA VALIDAR A SENHA
   # DO USUARIO ANTES DE ALGUMA OPERAÇÃO
   get '/verificar_senha' do
     content_type :json
-    halt 400, {message: 'parametros incorretos'}.to_json unless params[:id_usuario].present? && params[:senha].present?
+    unless params[:id_usuario].present? && params[:senha].present?
+      halt 400,
+           { message: 'parametros incorretos' }.to_json
+    end
     usuario = Usuario.find_by(id: params[:id_usuario])
-    halt  404, {message: 'usuario nao encontrado'}.to_json unless usuario
+    halt 404, { message: 'usuario nao encontrado' }.to_json unless usuario
     verificacao = Digest::MD5.hexdigest(params[:senha].strip) == usuario&.senha_hash
-    {verificacao: verificacao}.to_json
+    { verificacao: verificacao }.to_json
   end
 
-  #ROTA DE API PARA ALTERAR O STATUS DE UMA VENDA,
+  # ROTA DE API PARA ALTERAR O STATUS DE UMA VENDA,
   # SEJA POR PARTE DO COMPRADOR OU DO VENDEDOR
   put '/alterar_status_venda' do
     dados = JSON.parse(request.body.read)
@@ -351,7 +319,7 @@ class ECommerceApp < Sinatra::Base
     elsif venda&.comprador_id == usuario&.id
       status_options = %i[paga cancelada]
     else
-      status_options == nil
+      status_options.nil?
     end
     halt 400, 'INCOMPATIBILIDADE ENTRE VENDA E USUÁRIO' if status_options.nil?
     if status_options&.include?(dados['novo_status'].to_sym)
@@ -363,19 +331,17 @@ class ECommerceApp < Sinatra::Base
         halt 422, {
           message: 'Produtos sem estoque',
           error_type: 'sem_estoque',
-          itens_id: e.itens_inconsistentes.map {|item| item.id}
+          itens_id: e.itens_inconsistentes.map(&:id)
         }.to_json
       rescue ProdutoApagadoError => e
-        #apaga todos os itens que possuem produtos apagados
+        # apaga todos os itens que possuem produtos apagados
         e.itens_produtos_apagados.delete_all
         # apaga a venda se tiver ficado sem itens
-        unless venda.itens_venda.exists?
-          venda.destroy
-        end
+        venda.destroy unless venda.itens_venda.exists?
         content_type :json
         halt 422, {
           message: 'Produtos sem estoque',
-          error_type: 'produto_apagado',
+          error_type: 'produto_apagado'
         }.to_json
       end
     else
@@ -383,25 +349,19 @@ class ECommerceApp < Sinatra::Base
     end
   end
 
-  #ROTA DE API PARA DELETAR ITENS DE UMA VENDA PASSANDO OS IDs COMO PARÂMETRO
+  # ROTA DE API PARA DELETAR ITENS DE UMA VENDA PASSANDO OS IDs COMO PARÂMETRO
   delete '/itens_venda' do
     content_type :json
-    unless params[:id_itens].present?
-      halt 400, {message: 'id_vendas faltando'}.to_json
-    end
+    halt 400, { message: 'id_vendas faltando' }.to_json unless params[:id_itens].present?
     itens = ItemVenda.where(id: params[:id_itens])
-    if itens.empty?
-      halt 400, {message: 'nenhum item encontrado para os ids passados'}.to_json
-    end
+    halt 400, { message: 'nenhum item encontrado para os ids passados' }.to_json if itens.empty?
     venda_associada = itens.first.venda
     itens.destroy_all
-    unless venda_associada.itens_venda.exists?
-      venda_associada.destroy
-    end
-    halt 204, {message: 'Itens apagados'}.to_json
+    venda_associada.destroy unless venda_associada.itens_venda.exists?
+    halt 204, { message: 'Itens apagados' }.to_json
   end
 
-  #ROTA PARA ACESSAR OS PRODUTOS DO USUÁRIO
+  # ROTA PARA ACESSAR OS PRODUTOS DO USUÁRIO
   get '/produtos' do
     @usuario = Usuario.find_by(id: params[:id_usuario])
     halt 404, 'USUARIO NAO ENCONTRADO' unless @usuario
@@ -412,7 +372,7 @@ class ECommerceApp < Sinatra::Base
     erb :produtos
   end
 
-  #ROTA PARA CADASTRAR PRODUTO
+  # ROTA PARA CADASTRAR PRODUTO
   post '/produtos' do
     unless params[:nome].present? && params[:preco].present? && params[:estoque].present?
       halt 400, 'PARÂMETROS FALTANDO'
@@ -436,7 +396,7 @@ class ECommerceApp < Sinatra::Base
     end
   end
 
-  #ROTA PARA ACESSAR A TELA DE UM PRODUTO ESPECIFICO
+  # ROTA PARA ACESSAR A TELA DE UM PRODUTO ESPECIFICO
   post '/produtos/:id' do
     unless params[:nome].present? && params[:preco].present? && params[:estoque].present?
       halt 400, 'PARÂMETROS FALTANDO'
@@ -448,7 +408,6 @@ class ECommerceApp < Sinatra::Base
     produto = usuario.produtos.find_by(id: params[:id])
     halt 404, 'PRODUTO NAO ENCONTRADO' unless produto
 
-
     halt 422, produto.errors.full_messages.join(', ') unless produto.update(
       nome: params[:nome],
       descricao: params[:descricao],
@@ -458,7 +417,7 @@ class ECommerceApp < Sinatra::Base
     redirect back
   end
 
-  #ROTA PARA EXCLUIR UM PRODUTO
+  # ROTA PARA EXCLUIR UM PRODUTO
   post '/produtos/:id/excluir' do
     usuario = Usuario.find_by(id: params[:id_usuario])
     halt 404, 'USUARIO NAO ENCONTRADO' unless usuario
@@ -470,7 +429,7 @@ class ECommerceApp < Sinatra::Base
     redirect back
   end
 
-  #ROTA PARA EXIBIR AS VENDAS DO USUÁRIO
+  # ROTA PARA EXIBIR AS VENDAS DO USUÁRIO
   get '/vendas' do
     usuario = Usuario.find_by(id: params[:id_usuario])
     unless usuario
@@ -484,4 +443,3 @@ class ECommerceApp < Sinatra::Base
     erb :vendas_usuario
   end
 end
-

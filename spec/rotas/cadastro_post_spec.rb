@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require_relative 'support'
 
 describe 'POST /cadastro', type: :route do
   let(:atributos_validos) do
-    { nome: 'Novo usuario', email: 'novo@example.com', cpf: '12345678901', senha: 'senha-segura', confirmar_senha: 'senha-segura' }
+    { nome: 'Novo usuario', email: 'novo@example.com', cpf: '12345678901', senha: 'senha-segura',
+      confirmar_senha: 'senha-segura' }
   end
 
   context 'quando os dados são válidos' do

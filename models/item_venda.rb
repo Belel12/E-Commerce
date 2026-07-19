@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ItemVenda < ActiveRecord::Base
   self.table_name = 'itens_venda'
 
@@ -13,6 +15,7 @@ class ItemVenda < ActiveRecord::Base
   before_destroy :subtrair_total
 
   private
+
   def somar_total
     venda.update!(valor_total: venda.valor_total + preco_unitario * quantidade)
   end
@@ -22,9 +25,8 @@ class ItemVenda < ActiveRecord::Base
   end
 
   def validar_presenca_produto
-    if self.produto.nil?
-      self.errors.add(:produto,message: 'produto deste item não existe')
-    end
+    return unless produto.nil?
+
+    errors.add(:produto, message: 'produto deste item não existe')
   end
 end
-

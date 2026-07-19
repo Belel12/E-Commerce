@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Usuario, 'TESTES' do
   context 'usuario com atributos validos' do
     before :each do
@@ -5,8 +7,8 @@ describe Usuario, 'TESTES' do
         nome: 'fulano',
         senha_hash: 'senha1234',
         email: 'fulanoDoGrau69@hotmail.com',
-        cpf: '01234567890',
-        )
+        cpf: '01234567890'
+      )
       @senha_original = @usuario.senha_hash
     end
 
@@ -21,14 +23,14 @@ describe Usuario, 'TESTES' do
   end
 
   context 'usuario com qualquer atributo nulo' do
-    let(:usuario_defeituoso) {
+    let(:usuario_defeituoso) do
       Usuario.new(
         nome: '',
         email: '',
         cpf: '',
-        senha_hash: '',
+        senha_hash: ''
       )
-    }
+    end
 
     it 'nao deve ser persistido com sucesso' do
       expect(usuario_defeituoso.save).to be false
@@ -36,22 +38,22 @@ describe Usuario, 'TESTES' do
   end
 
   context 'usuario tenta cadastrar um email que ja existe no banco' do
-    let!(:usuario_valido1) {
+    let!(:usuario_valido1) do
       Usuario.create(
         nome: 'fulano1',
         email: 'emailunico@gmail.com',
         cpf: '01234567890',
-        senha_hash: 'senha1234',
+        senha_hash: 'senha1234'
       )
-    }
-    let(:usuario_valido2) {
+    end
+    let(:usuario_valido2) do
       Usuario.new(
         nome: 'fulano2',
         email: 'emailunico@gmail.com',
         cpf: '01234567890',
-        senha_hash: 'senha1234',
+        senha_hash: 'senha1234'
       )
-    }
+    end
 
     it 'nao deve ser cadastrado' do
       expect(usuario_valido2).to_not be_valid
@@ -59,14 +61,14 @@ describe Usuario, 'TESTES' do
   end
 
   context 'usuario com letras no cpf' do
-    let(:usuario_com_letras) {
+    let(:usuario_com_letras) do
       Usuario.new(
         nome: 'fulano',
         email: 'email@gmail.com',
         cpf: 'c1234b6789a',
-        senha_hash: 'senha1234',
+        senha_hash: 'senha1234'
       )
-    }
+    end
 
     it 'nao deve ser persistido com sucesso' do
       expect(usuario_com_letras).to_not be_valid
@@ -74,14 +76,14 @@ describe Usuario, 'TESTES' do
   end
 
   context 'usuario com cpf diferente de 11 caracteres' do
-    let(:usuario){
+    let(:usuario)  do
       Usuario.new(
         nome: 'usuario',
         senha_hash: 'senha1234',
         cpf: '012345678901',
         email: 'teste@gmail.com'
       )
-    }
+    end
 
     it 'nao deve poder ser salvo' do
       expect(usuario.save).to be false
