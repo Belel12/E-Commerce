@@ -8,10 +8,9 @@ node_modules/
 /vendor/
 
 #bancos
-db/schema.rb
-db/ecommerce.sqlite3
-db/ecommerce_dev.sqlite3
-db/ecommerce_test.sqlite3
+db/*
+!db/migrate/
+!db/seeds.rb
 
 #Arquivos temporários do rspec
 spec/temp/
